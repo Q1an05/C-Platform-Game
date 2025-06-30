@@ -12,6 +12,8 @@
                 "mario.c",
                 "input.c",
                 "render.c",
+                "camera.c",
+                "blocks.c",
                 "-I", "/opt/homebrew/include",
                 "-L", "/opt/homebrew/lib",
                 "-o",

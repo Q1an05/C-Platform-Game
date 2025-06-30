@@ -4,7 +4,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 // 游戏输入动作枚举
 typedef enum {

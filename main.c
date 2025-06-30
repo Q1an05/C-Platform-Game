@@ -3,12 +3,14 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "map.h"
 #include "mario.h"
 #include "render.h"
 #include "input.h"
 #include "camera.h"
+#include "blocks.h"
+#include "enemy.h"
 
 // 移动速度常量
 #define MARIO_SPEED 4.0f
@@ -24,11 +26,14 @@ bool game_over = false;
 
 // 处理用户输入（基于input模块的状态）
 void process_input() {
+    // 根据马里奥状态调整移动速度
+    float speed = (get_mario_state() == MARIO_BIG) ? MARIO_SPEED * 1.4f : MARIO_SPEED;
+    
     // 处理移动输入
     if (is_action_pressed(INPUT_LEFT)) {
-        set_mario_target_velocity(-MARIO_SPEED);
+        set_mario_target_velocity(-speed);
     } else if (is_action_pressed(INPUT_RIGHT)) {
-        set_mario_target_velocity(MARIO_SPEED);
+        set_mario_target_velocity(speed);
     } else {
         // 没有按左右键时，目标速度为0（摩擦力会逐渐减速）
         set_mario_target_velocity(0);
@@ -43,6 +48,13 @@ void process_input() {
 // 更新游戏状态
 void update_game() {
     update_mario(); // 更新马里奥状态
+    update_enemies(); // 更新敌人状态
+    
+    // 检查马里奥与敌人的碰撞
+    if (check_mario_enemy_collision()) {
+        // 马里奥受伤
+        mario_take_damage();
+    }
 }
 
 int main() {
@@ -54,12 +66,30 @@ int main() {
     
     init_mario();
     init_input();
+    init_blocks();
+    init_enemies();
 
     bool quit = false;
     SDL_Event e;
+    
+    // 帧率控制变量
+    const int TARGET_FPS = 60;
+    const int FRAME_TIME = 1000 / TARGET_FPS; // 16.67ms
+    
+    // 累计时间变量，用于更精确的帧率控制
+    Uint32 last_time = SDL_GetTicks();
+    float time_accumulator = 0.0f;
 
     // SDL2主循环
     while (!quit) {
+        Uint32 current_time = SDL_GetTicks();
+        float delta_time = (current_time - last_time) / 1000.0f; // 转换为秒
+        last_time = current_time;
+        
+        // 累计时间，确保稳定的更新频率
+        time_accumulator += delta_time;
+        const float fixed_timestep = 1.0f / TARGET_FPS;
+        
         // 处理事件
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -75,20 +105,39 @@ int main() {
             quit = true;
         }
 
-        process_input();
-        update_game();
+        // 固定时间步长更新（确保游戏逻辑稳定）
+        while (time_accumulator >= fixed_timestep) {
+            process_input();
+            update_game();
+            update_blocks();  // 更新方块状态
+            
+            // 定期清理死亡的敌人（每秒一次）
+            static int cleanup_counter = 0;
+            cleanup_counter++;
+            if (cleanup_counter >= TARGET_FPS) { // 每60帧（1秒）清理一次
+                remove_dead_enemies();
+                cleanup_counter = 0;
+            }
+            
+            // 更新输入帧状态
+            update_input_frame();
+            
+            time_accumulator -= fixed_timestep;
+        }
         
-        // 更新摄像机（跟随马里奥）
+        // 最后更新摄像机（在所有逻辑更新完成后）
         float mario_x, mario_y;
         get_mario_position(&mario_x, &mario_y);
         update_camera(mario_x, mario_y);
-        
-        // 更新输入帧状态（在帧结束时调用）
-        update_input_frame();
 
         render_game();
         
-        SDL_Delay(16); // 控制帧率，约60FPS
+        // 确保不超过目标帧率
+        Uint32 frame_end_time = SDL_GetTicks();
+        Uint32 frame_duration = frame_end_time - current_time;
+        if (frame_duration < FRAME_TIME) {
+            SDL_Delay(FRAME_TIME - frame_duration);
+        }
     }
 
     // 清理各个模块

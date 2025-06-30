@@ -4,7 +4,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 // 初始化SDL2窗口和渲染器
 int init_render();

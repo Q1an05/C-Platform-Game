@@ -10,8 +10,8 @@ Camera camera;
 
 // 摄像机参数
 #define TILE_SIZE 32
-#define CAMERA_FOLLOW_SPEED 0.1f
-#define CAMERA_DEAD_ZONE 64.0f
+#define CAMERA_FOLLOW_SPEED 0.12f  // 稍微提高跟随速度
+#define CAMERA_DEAD_ZONE 48.0f     // 稍微减小死区
 
 // 初始化摄像机
 void init_camera(int screen_width, int screen_height) {
@@ -34,15 +34,22 @@ void update_camera(float target_x, float target_y) {
     float dead_zone_left = camera.screen_width / 2.0f - camera.dead_zone_width / 2.0f;
     float dead_zone_right = camera.screen_width / 2.0f + camera.dead_zone_width / 2.0f;
     
-    // 水平方向跟随
+    // 水平方向跟随 - 使用动态跟随速度
     if (screen_mario_x < dead_zone_left || screen_mario_x > dead_zone_right) {
         float dx = target_camera_x - camera.x;
-        camera.x += dx * camera.follow_speed;
+        // 距离越远，跟随速度越快（动态跟随）
+        float distance_factor = fabsf(dx) / 100.0f + 1.0f;
+        float dynamic_speed = camera.follow_speed * distance_factor;
+        if (dynamic_speed > 0.3f) dynamic_speed = 0.3f; // 限制最大跟随速度
+        
+        camera.x += dx * dynamic_speed;
     }
     
-    // 垂直方向跟随（可选，通常平台游戏只水平跟随）
+    // 垂直方向跟随限制（减少垂直摄像机移动）
     float dy = target_camera_y - camera.y;
-    camera.y += dy * camera.follow_speed * 0.5f; // 垂直跟随较慢
+    if (fabsf(dy) > 32.0f) { // 只有垂直距离超过一个瓦片时才跟随
+        camera.y += dy * camera.follow_speed * 0.3f; // 垂直跟随更慢
+    }
     
     // 限制摄像机边界（不能超出地图范围）
     float max_camera_x = (MAP_WIDTH * TILE_SIZE) - camera.screen_width;
