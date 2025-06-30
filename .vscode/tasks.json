@@ -7,21 +7,23 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "main.c",
-                "map.c",
-                "mario.c",
-                "input.c",
-                "render.c",
-                "camera.c",
-                "blocks.c",
-                "-I", "/opt/homebrew/include",
+                "scripts/main.c",
+                "scripts/map.c",
+                "scripts/mario.c",
+                "scripts/input.c",
+                "scripts/render.c",
+                "scripts/camera.c",
+                "scripts/blocks.c",
+                "scripts/enemy.c",
+                "-I", "/opt/homebrew/include/SDL2",
+                "-D_THREAD_SAFE",
                 "-L", "/opt/homebrew/lib",
                 "-o",
-                "${fileDirname}/mario",
+                "mario_game",
                 "-lSDL2"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"

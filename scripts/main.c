@@ -26,8 +26,8 @@ bool game_over = false;
 
 // 处理用户输入（基于input模块的状态）
 void process_input() {
-    // 根据马里奥状态调整移动速度
-    float speed = (get_mario_state() == MARIO_BIG) ? MARIO_SPEED * 1.4f : MARIO_SPEED;
+    // 固定移动速度
+    float speed = MARIO_SPEED;
     
     // 处理移动输入
     if (is_action_pressed(INPUT_LEFT)) {

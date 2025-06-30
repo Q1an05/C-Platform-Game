@@ -12,26 +12,27 @@ Enemy enemies[MAX_ENEMIES];
 int enemy_count = 0;
 
 // 敌人物理常量
-#define TILE_SIZE 32
+#define TILE_SIZE 16
 #define GRAVITY 0.5f
 #define MAX_FALL_SPEED 10.0f
 
 // 栗子小子常量
 #define GOOMBA_SPEED 1.0f
-#define GOOMBA_WIDTH 32
-#define GOOMBA_HEIGHT 32
+#define GOOMBA_WIDTH 16
+#define GOOMBA_HEIGHT 16
 #define DEATH_ANIMATION_TIME 1.0f  // 死亡动画持续时间（秒）
 
 // 初始化敌人系统
 void init_enemies() {
     enemy_count = 0;
     
-    // 在地图中预设一些敌人位置
-    add_enemy(ENEMY_GOOMBA, 10 * TILE_SIZE, 6 * TILE_SIZE);  // 第10列
-    add_enemy(ENEMY_GOOMBA, 15 * TILE_SIZE, 6 * TILE_SIZE);  // 第15列
-    add_enemy(ENEMY_GOOMBA, 25 * TILE_SIZE, 6 * TILE_SIZE);  // 第25列
-    add_enemy(ENEMY_GOOMBA, 35 * TILE_SIZE, 6 * TILE_SIZE);  // 第35列
-    add_enemy(ENEMY_GOOMBA, 45 * TILE_SIZE, 6 * TILE_SIZE);  // 第45列
+    // 在地图中预设一些敌人位置（调整为更近的位置方便测试）
+    add_enemy(ENEMY_GOOMBA, 8 * TILE_SIZE, 6 * TILE_SIZE);   // 第8列
+    add_enemy(ENEMY_GOOMBA, 12 * TILE_SIZE, 6 * TILE_SIZE);  // 第12列
+    add_enemy(ENEMY_GOOMBA, 20 * TILE_SIZE, 6 * TILE_SIZE);  // 第20列
+    add_enemy(ENEMY_GOOMBA, 30 * TILE_SIZE, 6 * TILE_SIZE);  // 第30列
+    
+    printf("敌人系统初始化完成，创建了%d个敌人\n", enemy_count);
 }
 
 // 添加敌人
