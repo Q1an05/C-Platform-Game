@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     "/Users/mac/小学期作业/mario"
+relocations:     []
+...
