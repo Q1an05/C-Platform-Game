@@ -4,6 +4,8 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
+#include "map.h"
+
 // 敌人类型枚举
 typedef enum {
     ENEMY_GOOMBA,    // 栗子小子

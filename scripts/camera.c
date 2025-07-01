@@ -25,9 +25,9 @@ void init_camera(int screen_width, int screen_height) {
 
 // 更新摄像机位置（跟随目标）
 void update_camera(float target_x, float target_y) {
-    // 计算摄像机应该跟随的目标位置（让马里奥在屏幕中央偏左）
+    // 计算摄像机应该跟随的目标位置（让马里奥在屏幕中央偏左，垂直方向抬高一格）
     float target_camera_x = target_x - camera.screen_width / 3.0f;
-    float target_camera_y = target_y - camera.screen_height / 2.0f;
+    float target_camera_y = target_y - camera.screen_height / 2.0f - TILE_SIZE;
     
     // 死区检测（只有马里奥离开死区时摄像机才移动）
     float screen_mario_x = target_x - camera.x;
@@ -56,7 +56,7 @@ void update_camera(float target_x, float target_y) {
     if (camera.x < 0) camera.x = 0;
     if (camera.x > max_camera_x) camera.x = max_camera_x;
     
-    float max_camera_y = (MAP_HEIGHT * TILE_SIZE) - camera.screen_height;
+    float max_camera_y = (MAP_HEIGHT * TILE_SIZE) - camera.screen_height - TILE_SIZE;
     if (camera.y < 0) camera.y = 0;
     if (camera.y > max_camera_y) camera.y = max_camera_y;
 }

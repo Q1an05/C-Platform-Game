@@ -5,9 +5,9 @@ CC = gcc
 CFLAGS = -std=c99 -Wall
 LDFLAGS = $(shell sdl2-config --cflags --libs) -lSDL2_image
 
-# 源文件
-SOURCES = main.c mario.c map.c render.c input.c camera.c blocks.c enemy.c sprite.c
-HEADERS = mario.h map.h render.h input.h camera.h blocks.h enemy.h sprite.h
+# 源文件（在scripts文件夹中）
+SOURCES = scripts/main.c scripts/mario.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c
+HEADERS = scripts/mario.h scripts/map.h scripts/render.h scripts/input.h scripts/camera.h scripts/blocks.h scripts/enemy.h
 
 # 目标文件
 TARGET = mario_game

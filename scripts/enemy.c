@@ -6,6 +6,7 @@
 #include "mario.h"
 #include <stdio.h>
 #include <math.h>
+#include "blocks.h" // 确保包含blocks.h
 
 // 全局敌人数组
 Enemy enemies[MAX_ENEMIES];
@@ -26,13 +27,20 @@ int enemy_count = 0;
 void init_enemies() {
     enemy_count = 0;
     
-    // 在地图中预设一些敌人位置（调整为更近的位置方便测试）
-    add_enemy(ENEMY_GOOMBA, 8 * TILE_SIZE, 6 * TILE_SIZE);   // 第8列
-    add_enemy(ENEMY_GOOMBA, 12 * TILE_SIZE, 6 * TILE_SIZE);  // 第12列
-    add_enemy(ENEMY_GOOMBA, 20 * TILE_SIZE, 6 * TILE_SIZE);  // 第20列
-    add_enemy(ENEMY_GOOMBA, 30 * TILE_SIZE, 6 * TILE_SIZE);  // 第30列
+    // 从地图中读取敌人位置
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            if (game_map[y][x] == 'E') {
+                // 在地图位置创建栗子小子敌人
+                add_enemy(ENEMY_GOOMBA, x * TILE_SIZE, y * TILE_SIZE);
+                
+                // 将地图中的敌人标记替换为空地，避免渲染时显示
+                game_map[y][x] = ' ';
+            }
+        }
+    }
     
-    printf("敌人系统初始化完成，创建了%d个敌人\n", enemy_count);
+    printf("敌人系统初始化完成，从地图中创建了%d个敌人\n", enemy_count);
 }
 
 // 添加敌人
@@ -81,9 +89,10 @@ int check_enemy_collision(Enemy* enemy, float new_x, float new_y) {
         return 1; // 碰撞
     }
     
-    // 砖块碰撞检查
-    char tile = game_map[grid_y][grid_x];
-    if (tile == '#' || tile == '?') {
+    // 使用block_type判断所有地面类型
+    BlockType block_type = get_block_type(grid_x, grid_y);
+    if (block_type == BLOCK_NORMAL || block_type == BLOCK_REWARD ||
+        block_type == BLOCK_GRASS || block_type == BLOCK_MUD) {
         return 1; // 碰撞
     }
     

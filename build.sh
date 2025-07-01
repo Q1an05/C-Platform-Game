@@ -10,8 +10,9 @@ if ! command -v sdl2-config &> /dev/null; then
 fi
 
 # 编译游戏
+# 注意-lSDL2_image必须在最后
 gcc -I/opt/homebrew/include/SDL2 -D_THREAD_SAFE -L/opt/homebrew/lib \
-    scripts/*.c -o mario_game -lSDL2
+    scripts/*.c -o mario_game -lSDL2 -lSDL2_image
 
 # 检查编译结果
 if [ $? -eq 0 ]; then

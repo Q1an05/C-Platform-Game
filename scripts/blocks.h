@@ -8,7 +8,10 @@
 typedef enum {
     BLOCK_NONE,     // 无方块
     BLOCK_NORMAL,   // 普通砖块
-    BLOCK_REWARD    // 奖励方块（问号方块）
+    BLOCK_REWARD,   // 奖励方块（问号方块）
+    BLOCK_GOAL,     // 通关方块
+    BLOCK_GRASS,    // 草地方块（地表）
+    BLOCK_MUD       // 泥土方块（地下）
 } BlockType;
 
 // 方块状态枚举

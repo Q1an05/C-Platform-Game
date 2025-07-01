@@ -24,6 +24,8 @@ Mario mario;
 #define MAX_FALL_SPEED 10.0f
 #define TILE_SIZE 16
 
+extern int game_over;
+
 // 初始化马里奥
 void init_mario() {
     mario.x = 2 * TILE_SIZE;      // 初始位置（像素坐标）
@@ -38,6 +40,11 @@ void init_mario() {
     mario.lives = 3;              // 初始3条生命
     mario.hurt_timer = 0.0f;      // 初始无受伤状态
     mario.facing_right = 1;       // 初始面向右
+    
+    // 初始化动画状态
+    mario.anim_state = MARIO_ANIM_IDLE;
+    mario.anim_timer = 0.0f;
+    mario.anim_frame = 0;
 }
 
 // 检查指定位置是否有碰撞（撞墙或超出边界）
@@ -51,9 +58,10 @@ int check_collision(float x, float y) {
         return 1; // 碰撞
     }
     
-    // 砖块和奖励方块碰撞检查
-    char tile = game_map[grid_y][grid_x];
-    if (tile == '#' || tile == '?') {
+    // 检查方块类型
+    BlockType block_type = get_block_type(grid_x, grid_y);
+    if (block_type == BLOCK_NORMAL || block_type == BLOCK_REWARD || 
+        block_type == BLOCK_GRASS || block_type == BLOCK_MUD) {
         return 1; // 碰撞
     }
     
@@ -114,6 +122,7 @@ void update_mario_horizontal_movement() {
 // 更新马里奥状态（每帧调用）
 void update_mario() {
     if (!mario.alive) return;
+    if (game_over) return;
     
     // 更新受伤无敌时间
     if (mario.hurt_timer > 0) {
@@ -124,6 +133,41 @@ void update_mario() {
     // 更新面向方向
     if (mario.vx > 0.1f) mario.facing_right = 1;
     else if (mario.vx < -0.1f) mario.facing_right = 0;
+    
+    // 更新动画状态
+    MarioAnimationState new_anim_state;
+    if (fabsf(mario.vx) > 0.1f) {
+        new_anim_state = MARIO_ANIM_RUN;  // 移动时播放跑步动画
+    } else {
+        new_anim_state = MARIO_ANIM_IDLE; // 静止时播放静止动画
+    }
+    
+    // 如果动画状态改变，重置动画
+    if (new_anim_state != mario.anim_state) {
+        mario.anim_state = new_anim_state;
+        mario.anim_timer = 0.0f;
+        mario.anim_frame = 0;
+    }
+    
+    // 更新动画帧
+    const float ANIM_SPEED = 0.1f; // 动画播放速度（每帧0.1秒）
+    mario.anim_timer += 1.0f / 60.0f; // 假设60FPS
+    
+    if (mario.anim_timer >= ANIM_SPEED) {
+        mario.anim_timer = 0.0f;
+        
+        // 获取当前动画的最大帧数
+        int max_frames;
+        if (mario.anim_state == MARIO_ANIM_IDLE) {
+            max_frames = 4;  // idle有4帧
+        } else if (mario.anim_state == MARIO_ANIM_RUN) {
+            max_frames = 16; // run有16帧
+        } else {
+            max_frames = 1;
+        }
+        
+        mario.anim_frame = (mario.anim_frame + 1) % max_frames;
+    }
     
     // 更新水平移动（应用摩擦力和加速度）
     update_mario_horizontal_movement();
@@ -204,6 +248,14 @@ void update_mario() {
     if (mario.y > MAP_HEIGHT * TILE_SIZE) {
         mario_take_damage();
         printf("马里奥掉出地图！\n");
+    }
+
+    // 检查是否到达通关方块
+    int mario_grid_x = (int)((mario.x + mario.width / 2) / TILE_SIZE);
+    int mario_grid_y = (int)((mario.y + mario.height / 2) / TILE_SIZE);
+    if (get_block_type(mario_grid_x, mario_grid_y) == BLOCK_GOAL) {
+        game_over = 1;
+        printf("恭喜通关！你成功到达终点！\n");
     }
 }
 
@@ -293,4 +345,17 @@ int mario_is_invulnerable() {
 // 获取马里奥生命数
 int mario_get_lives() {
     return mario.lives;
+}
+
+// 动画相关接口实现
+MarioAnimationState get_mario_animation_state() {
+    return mario.anim_state;
+}
+
+int get_mario_animation_frame() {
+    return mario.anim_frame;
+}
+
+int is_mario_facing_right() {
+    return mario.facing_right;
 } 

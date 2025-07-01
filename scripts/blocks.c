@@ -39,8 +39,14 @@ BlockType get_block_type(int map_x, int map_y) {
     
     if (tile == '?') {
         return BLOCK_REWARD;  // 奖励方块
+    } else if (tile == 'G') {
+        return BLOCK_GRASS;  // 草地方块
+    } else if (tile == 'M') {
+        return BLOCK_MUD;    // 泥土方块
     } else if (tile == '#') {
-        return BLOCK_NORMAL;  // 普通砖块
+        return BLOCK_NORMAL; // 普通砖块（可选）
+    } else if (tile == 'T') {
+        return BLOCK_GOAL;   // 通关方块
     }
     
     return BLOCK_NONE;  // 空地

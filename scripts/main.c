@@ -123,6 +123,12 @@ int main() {
             update_input_frame();
             
             time_accumulator -= fixed_timestep;
+            
+            if (game_over) {
+                quit = true;
+                printf("游戏通关，感谢游玩！\n");
+                break;
+            }
         }
         
         // 最后更新摄像机（在所有逻辑更新完成后）
