@@ -18,6 +18,9 @@ SDL_Renderer* gRenderer = NULL;
 // 全局纹理指针
 static SDL_Texture* grass_texture = NULL;
 static SDL_Texture* mud_texture = NULL;
+static SDL_Texture* fruit1_texture = NULL;
+static SDL_Texture* fruit2_texture = NULL;
+static SDL_Texture* fruit3_texture = NULL;
 
 // 角色动画纹理数组
 static SDL_Texture* player_idle_textures[4];   // idle动画4帧
@@ -88,6 +91,27 @@ int load_textures() {
         return 0;
     }
     
+    // 加载二连跳奖励方块纹理
+    fruit1_texture = load_texture_from_file("assets/sprites/rewards/fruit1.png");
+    if (!fruit1_texture) {
+        printf("二连跳奖励方块纹理加载失败！\n");
+        return 0;
+    }
+    
+    // 加载冲刺奖励方块纹理
+    fruit2_texture = load_texture_from_file("assets/sprites/rewards/fruit2.png");
+    if (!fruit2_texture) {
+        printf("冲刺奖励方块纹理加载失败！\n");
+        return 0;
+    }
+    
+    // 加载通关奖励方块纹理
+    fruit3_texture = load_texture_from_file("assets/sprites/rewards/fruit3.png");
+    if (!fruit3_texture) {
+        printf("通关奖励方块纹理加载失败！\n");
+        return 0;
+    }
+    
     printf("地图纹理加载成功！\n");
     return 1;
 }
@@ -101,6 +125,18 @@ void cleanup_textures() {
     if (mud_texture) {
         SDL_DestroyTexture(mud_texture);
         mud_texture = NULL;
+    }
+    if (fruit1_texture) {
+        SDL_DestroyTexture(fruit1_texture);
+        fruit1_texture = NULL;
+    }
+    if (fruit2_texture) {
+        SDL_DestroyTexture(fruit2_texture);
+        fruit2_texture = NULL;
+    }
+    if (fruit3_texture) {
+        SDL_DestroyTexture(fruit3_texture);
+        fruit3_texture = NULL;
     }
     IMG_Quit();
 }
@@ -237,15 +273,10 @@ void render_game() {
             // 检查方块类型并绘制
             BlockType block_type = get_block_type(x, y);
             
-            if (block_type == BLOCK_REWARD) {
-                // 奖励方块：检查是否被撞击过
-                if (is_block_hit(x, y)) {
-                    draw_colored_rect(gRenderer, rect.x, rect.y, rect.w, rect.h, COLOR_USED);
-                } else {
-                    draw_colored_rect(gRenderer, rect.x, rect.y, rect.w, rect.h, COLOR_REWARD);
-                }
+            if (block_type == BLOCK_DOUBLE_JUMP) {
+                draw_texture(gRenderer, fruit1_texture, rect.x, rect.y, rect.w, rect.h);
             } else if (block_type == BLOCK_GOAL) {
-                draw_colored_rect(gRenderer, rect.x, rect.y, rect.w, rect.h, COLOR_GOAL);
+                draw_texture(gRenderer, fruit3_texture, rect.x, rect.y, rect.w, rect.h);
             } else if (block_type == BLOCK_GRASS) {
                 // 草地方块：使用草地纹理
                 draw_texture(gRenderer, grass_texture, rect.x, rect.y, rect.w, rect.h);
@@ -255,6 +286,8 @@ void render_game() {
             } else if (block_type == BLOCK_NORMAL || game_map[y][x] == '#') {
                 // 普通砖块（备用，不应该到达这里）
                 draw_colored_rect(gRenderer, rect.x, rect.y, rect.w, rect.h, COLOR_WALL);
+            } else if (block_type == BLOCK_DASH) {
+                draw_texture(gRenderer, fruit2_texture, rect.x, rect.y, rect.w, rect.h);
             }
         }
     }

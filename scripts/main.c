@@ -12,9 +12,6 @@
 #include "blocks.h"
 #include "enemy.h"
 
-// 移动速度常量
-#define KNIGHT_SPEED 4.0f
-
 // 这里可以包含你自己写的头文件
 // #include "map.h"
 // #include "knight.h"
@@ -23,27 +20,6 @@
 
 // 游戏是否结束的标志
 bool game_over = false;
-
-// 处理用户输入（基于input模块的状态）
-void process_input() {
-    // 固定移动速度
-    float speed = KNIGHT_SPEED;
-    
-    // 处理移动输入
-    if (is_action_pressed(INPUT_LEFT)) {
-        set_knight_target_velocity(-speed);
-    } else if (is_action_pressed(INPUT_RIGHT)) {
-        set_knight_target_velocity(speed);
-    } else {
-        // 没有按左右键时，目标速度为0（摩擦力会逐渐减速）
-        set_knight_target_velocity(0);
-    }
-    
-    // 处理跳跃输入（只在刚按下时跳跃，避免连续跳跃）
-    if (is_action_just_pressed(INPUT_JUMP)) {
-        knight_jump();
-    }
-}
 
 // 更新游戏状态
 void update_game() {

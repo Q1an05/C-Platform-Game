@@ -10,21 +10,12 @@
 // 全局骑士对象
 Knight knight;
 
-// 骑士物理常量
-#define KNIGHT_MAX_SPEED 2.0f
-#define KNIGHT_ACCELERATION 0.8f
-#define KNIGHT_WIDTH 15             // 宽度15像素
-#define KNIGHT_HEIGHT 20            // 高度20像素
-
-// 通用物理常量
-#define GROUND_FRICTION 0.15f
-#define AIR_FRICTION 0.05f
-#define GRAVITY 0.5f
-#define JUMP_FORCE -6.0f
-#define MAX_FALL_SPEED 10.0f
-#define TILE_SIZE 16
-
 extern int game_over;
+
+// 存档点坐标
+static float save_x = 2 * TILE_SIZE;
+static float save_y = 6 * TILE_SIZE;
+static int save_set = 0; // 是否已存档
 
 // 初始化骑士
 void init_knight() {
@@ -50,6 +41,12 @@ void init_knight() {
     knight.is_taking_damage = 0;
     knight.is_dying = 0;
     knight.state_timer = 0.0f;
+    knight.can_double_jump = 0;
+    knight.double_jump_used = 0;
+    knight.can_dash = 0;
+    knight.is_dashing = 0;
+    knight.dash_timer = 0.0f;
+    knight.dash_cooldown = 0.0f;
 }
 
 // 检查指定位置是否有碰撞（撞墙或超出边界）
@@ -65,7 +62,7 @@ int check_collision(float x, float y) {
     
     // 检查方块类型
     BlockType block_type = get_block_type(grid_x, grid_y);
-    if (block_type == BLOCK_NORMAL || block_type == BLOCK_REWARD || 
+    if (block_type == BLOCK_NORMAL || 
         block_type == BLOCK_GRASS || block_type == BLOCK_MUD) {
         return 1; // 碰撞
     }
@@ -92,28 +89,30 @@ int check_ceiling_collision(float x, float y) {
            check_collision(x + knight.width - 1, y);
 }
 
-// 更新骑士的水平速度（应用加速度和摩擦力）
+// 更新骑士的水平速度（简化的加速度逻辑）
 void update_knight_horizontal_movement() {
     float friction = knight.on_ground ? GROUND_FRICTION : AIR_FRICTION;
     
-    // 计算速度差
-    float speed_diff = knight.target_vx - knight.vx;
-    
-    if (knight.target_vx != 0) {
-        // 有目标速度时，向目标速度加速
-        if (speed_diff > 0) {
+    if (knight.target_vx > 0) {
+        // 按下右键：向右加速，但不超过目标速度
+        if (knight.vx < knight.target_vx) {
             knight.vx += KNIGHT_ACCELERATION;
-            if (knight.vx > knight.target_vx) {
-                knight.vx = knight.target_vx;
-            }
-        } else if (speed_diff < 0) {
-            knight.vx -= KNIGHT_ACCELERATION;
-            if (knight.vx < knight.target_vx) {
-                knight.vx = knight.target_vx;
-            }
         }
+        else {
+            knight.vx -= friction;
+        }
+        // 如果当前速度已经大于等于目标速度，摩擦力减速
+    } else if (knight.target_vx < 0) {
+        // 按下左键：向左加速，但不超过目标速度（绝对值）
+        if (knight.vx > knight.target_vx) {
+            knight.vx -= KNIGHT_ACCELERATION;
+        }
+        else {
+            knight.vx += friction;
+        }
+        // 如果当前速度已经小于等于目标速度，摩擦力减速
     } else {
-        // 没有目标速度时，应用摩擦力减速
+        // 没有按方向键：应用摩擦力减速
         if (knight.vx > 0) {
             knight.vx -= friction;
             if (knight.vx < 0) knight.vx = 0;
@@ -122,10 +121,6 @@ void update_knight_horizontal_movement() {
             if (knight.vx > 0) knight.vx = 0;
         }
     }
-    
-    // 限制最大速度
-    if (knight.vx > KNIGHT_MAX_SPEED) knight.vx = KNIGHT_MAX_SPEED;
-    if (knight.vx < -KNIGHT_MAX_SPEED) knight.vx = -KNIGHT_MAX_SPEED;
 }
 
 // 更新骑士状态（每帧调用）
@@ -265,6 +260,9 @@ void update_knight() {
             knight.y = (float)(grid_y * TILE_SIZE) - knight.height;
             knight.vy = 0;
             knight.on_ground = 1;
+            knight.double_jump_used = 0;
+            knight.is_dashing = 0;
+            knight.dash_timer = 0.0f;
         } else {
             knight.y = new_y;
             knight.on_ground = 0;
@@ -285,12 +283,6 @@ void update_knight() {
             knight.on_ground = 0;
         }
     }
-    
-    // 检查是否掉出地图底部（死亡）
-    if (knight.y > MAP_HEIGHT * TILE_SIZE) {
-        knight_take_damage();
-        printf("骑士掉出地图！\n");
-    }
 
     // 检查是否到达通关方块
     int knight_grid_x = (int)((knight.x + knight.width / 2) / TILE_SIZE);
@@ -299,6 +291,60 @@ void update_knight() {
         game_over = 1;
         printf("恭喜通关！你成功到达终点！\n");
     }
+
+    // 检查是否获得二连跳能力
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_DOUBLE_JUMP) {
+        if (collect_double_jump_block(knight_grid_x, knight_grid_y)) {
+            knight_enable_double_jump();
+            printf("获得二连跳能力！\n");
+        }
+    }
+
+    // 检查是否获得冲刺能力
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_DASH) {
+        if (collect_dash_block(knight_grid_x, knight_grid_y)) {
+            knight_enable_dash();
+            printf("获得冲刺能力！\n");
+        }
+    }
+
+    // 处理冲刺状态
+    if (knight.is_dashing) {
+        knight.dash_timer -= 1.0f / 60.0f;
+        if (knight.dash_timer <= 0) {
+            knight.is_dashing = 0;
+            knight.dash_timer = 0.0f;
+            knight.dash_cooldown = 0.5f; // 0.5秒冷却
+        }
+    }
+
+    // 每帧递减冷却
+    if (knight.dash_cooldown > 0) {
+        knight.dash_cooldown -= 1.0f / 60.0f;
+        if (knight.dash_cooldown < 0) knight.dash_cooldown = 0;
+    }
+
+    // 检查是否到达存档点方块
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_SAVE && !save_set) {
+        save_x = knight.x;
+        save_y = knight.y;
+        save_set = 1;
+        printf("存档点已记录：(%f, %f)\n", save_x, save_y);
+    }
+    // 检查是否到达陷阱方块
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_TRAP) {
+        if (knight.lives > 1) {
+            knight_take_damage();
+            knight.x = save_x;
+            knight.y = save_y;
+            knight.vx = 0;
+            knight.vy = 0;
+            printf("骑士踩到陷阱，扣血并回到存档点！\n");
+        } else {
+            knight_take_damage();
+            printf("骑士踩到陷阱，死亡！\n");
+        }
+    }
 }
 
 // 骑士跳跃
@@ -306,6 +352,10 @@ void knight_jump() {
     if (knight.on_ground && knight.alive) {
         knight.vy = JUMP_FORCE;
         knight.on_ground = 0;
+        knight.double_jump_used = 0;
+    } else if (knight.can_double_jump && !knight.double_jump_used && knight.alive) {
+        knight.vy = JUMP_FORCE;
+        knight.double_jump_used = 1;
     }
 }
 
@@ -355,28 +405,21 @@ int check_block_collision() {
 
 // 骑士受伤
 void knight_take_damage() {
-    if (!knight.alive || knight.hurt_timer > 0 || knight.is_taking_damage || knight.is_dying) return; // 已死亡或无敌时不受伤
-    
+    if (!knight.alive || knight.hurt_timer > 0 || knight.is_taking_damage || knight.is_dying) return;
     knight.lives--;
     printf("骑士受伤！剩余生命：%d\n", knight.lives);
-    
+
     if (knight.lives <= 0) {
-        // 开始死亡动画
         knight.is_dying = 1;
-        knight.state_timer = 1.2f; // 死亡动画持续1.2秒，延长时间
+        knight.state_timer = 1.2f;
         printf("骑士死亡！游戏结束！\n");
     } else {
-        // 开始受击动画
         knight.is_taking_damage = 1;
-        knight.state_timer = 0.6f; // 受击动画持续0.6秒，延长一点
-        
-        // 设置无敌时间（2秒）
+        knight.state_timer = 0.6f;
         knight.hurt_timer = 2.0f;
-        
-        // 不重置骑士位置，让骑士在原地受击
-        // 可以稍微减速，但不完全停止
         knight.vx *= 0.3f;
         knight.target_vx = 0;
+        // 不再回到起点
     }
 }
 
@@ -401,4 +444,23 @@ int get_knight_animation_frame() {
 
 int is_knight_facing_right() {
     return knight.facing_right;
+}
+
+// 获得二连跳能力
+void knight_enable_double_jump() {
+    knight.can_double_jump = 1;
+}
+
+// 冲刺逻辑
+void knight_dash() {
+    if (knight.can_dash && !knight.is_dashing && knight.alive && knight.dash_cooldown <= 0.0f) {
+        knight.is_dashing = 1;
+        knight.dash_timer = 0.18f; // 冲刺持续0.18秒
+        knight.vx = knight.facing_right ? DASH_SPEED : -DASH_SPEED;
+    }
+}
+
+// 获得冲刺能力
+void knight_enable_dash() {
+    knight.can_dash = 1;
 } 

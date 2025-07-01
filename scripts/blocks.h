@@ -8,11 +8,14 @@
 typedef enum {
     BLOCK_NONE,     // 无方块
     BLOCK_NORMAL,   // 普通砖块
-    BLOCK_REWARD,   // 奖励方块（问号方块）
     BLOCK_GOAL,     // 通关方块
     BLOCK_GRASS,    // 草地方块（地表）
     BLOCK_MUD,      // 泥土方块（地下）
-    BLOCK_ENEMY_BARRIER  // 敌人屏障（不可见，只阻挡敌人）
+    BLOCK_ENEMY_BARRIER,  // 敌人屏障（不可见，只阻挡敌人）
+    BLOCK_DOUBLE_JUMP,     // 二连跳奖励方块
+    BLOCK_DASH,             // 冲刺奖励方块
+    BLOCK_TRAP,             // 陷阱方块（透明，不可见，角色触碰扣血回到起点）
+    BLOCK_SAVE              // 存档点方块（透明，不可见，角色触碰后记录当前位置）
 } BlockType;
 
 // 方块状态枚举
@@ -35,5 +38,7 @@ BlockType get_block_type(int map_x, int map_y);  // 获取指定位置的方块�
 int hit_block(int map_x, int map_y);             // 撞击方块，返回是否成功
 int is_block_hit(int map_x, int map_y);          // 检查方块是否已被撞击
 void render_blocks();                             // 渲染方块（由render模块调用）
+int collect_double_jump_block(int map_x, int map_y); // 收集二连跳奖励方块
+int collect_dash_block(int map_x, int map_y); // 收集冲刺奖励方块
 
 #endif // BLOCKS_H 

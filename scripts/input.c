@@ -2,6 +2,8 @@
 // 输入处理模块实现
 
 #include "input.h"
+#include "knight.h"
+#include "map.h"
 
 // 键盘状态数组
 static int current_keys[INPUT_COUNT];   // 当前帧的按键状态
@@ -13,8 +15,11 @@ static SDL_Keycode key_mapping[INPUT_COUNT] = {
     [INPUT_RIGHT] = SDLK_RIGHT,    // 右方向键
     [INPUT_JUMP]  = SDLK_SPACE,    // 空格键
     [INPUT_PAUSE] = SDLK_p,        // P键暂停
-    [INPUT_QUIT]  = SDLK_ESCAPE    // ESC键退出
+    [INPUT_QUIT]  = SDLK_ESCAPE,   // ESC键退出
+    [INPUT_DASH]  = SDLK_d         // D键冲刺
 };
+
+extern Knight knight;
 
 // 初始化输入系统
 void init_input() {
@@ -83,4 +88,26 @@ int is_action_released(InputAction action) {
 void cleanup_input() {
     // 当前实现不需要特殊清理
     // 可以在这里释放资源或重置状态
+}
+
+void process_input() {
+    float speed = KNIGHT_MAX_SPEED;
+    // 移动输入
+    if (!knight.is_dashing) {
+        if (is_action_pressed(INPUT_LEFT)) {
+            set_knight_target_velocity(-speed);
+        } else if (is_action_pressed(INPUT_RIGHT)) {
+            set_knight_target_velocity(speed);
+        } else {
+            set_knight_target_velocity(0);
+        }
+    }
+    // 跳跃输入
+    if (is_action_just_pressed(INPUT_JUMP)) {
+        knight_jump();
+    }
+    // 冲刺输入
+    if (is_action_just_pressed(INPUT_DASH)) {
+        knight_dash();
+    }
 } 

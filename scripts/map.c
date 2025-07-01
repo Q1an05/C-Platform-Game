@@ -4,15 +4,19 @@
 #include "map.h"
 
 char game_map[MAP_HEIGHT][MAP_WIDTH+1] = {
-    "                                                                               #",
-    "                                                                               #",
-    "                                                                               #",
-    "                                                                              #",
-    "                                                                               #",
-    "                                                                               #",
-    "                                                                               #",
-    "                                                                               #",
-    "        B E    B            B   E   B                   B E B                  #",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM"
+    "                                                                                           ",
+    "                                                                                           ",
+    "                                                                                           ",
+    "                                    B  E  B  D                                             ",
+    "                                MMMMMMMMMMMMMMMMMMM                                        ",
+    "                               M                                                           ",
+    "                              M                                                            ",
+    "                             M                                                             ",
+    "                            M                                                              ",
+    "                                             M                                             ",
+    "                                         M   M                                             ",
+    "                                     M   M   M                                             ",
+    "              B    E    B        M   M   M   M      F         SSS                      t   ",
+    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG           GGGGGGGGGGGGG",
+    "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTTTTTTTTTTTMMMMMMMMMMMMM"
 }; 

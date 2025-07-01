@@ -12,6 +12,8 @@ Camera camera;
 #define TILE_SIZE 32
 #define CAMERA_FOLLOW_SPEED 0.12f  // 稍微提高跟随速度
 #define CAMERA_DEAD_ZONE 48.0f     // 稍微减小死区
+#define CAMERA_VERTICAL_DEAD_ZONE 126.0f   // 竖直方向死区更大
+#define CAMERA_VERTICAL_SPEED_SCALE 0.15f // 竖直方向跟随速度更慢
 
 // 初始化摄像机
 void init_camera(int screen_width, int screen_height) {
@@ -29,26 +31,31 @@ void update_camera(float target_x, float target_y) {
     float target_camera_x = target_x - camera.screen_width / 3.0f;
     float target_camera_y = target_y - camera.screen_height / 2.0f - TILE_SIZE;
     
-    // 死区检测（只有马里奥离开死区时摄像机才移动）
+    // 死区检测参数
     float screen_knight_x = target_x - camera.x;
     float dead_zone_left = camera.screen_width / 2.0f - camera.dead_zone_width / 2.0f;
     float dead_zone_right = camera.screen_width / 2.0f + camera.dead_zone_width / 2.0f;
+    // 新增竖直死区
+    float screen_knight_y = target_y - camera.y;
+    float dead_zone_top = camera.screen_height / 2.0f - CAMERA_VERTICAL_DEAD_ZONE / 2.0f;
+    float dead_zone_bottom = camera.screen_height / 2.0f + CAMERA_VERTICAL_DEAD_ZONE / 2.0f;
     
     // 水平方向跟随 - 使用动态跟随速度
     if (screen_knight_x < dead_zone_left || screen_knight_x > dead_zone_right) {
         float dx = target_camera_x - camera.x;
-        // 距离越远，跟随速度越快（动态跟随）
         float distance_factor = fabsf(dx) / 100.0f + 1.0f;
         float dynamic_speed = camera.follow_speed * distance_factor;
         if (dynamic_speed > 0.3f) dynamic_speed = 0.3f; // 限制最大跟随速度
-        
         camera.x += dx * dynamic_speed;
     }
     
-    // 垂直方向跟随限制（减少垂直摄像机移动）
-    float dy = target_camera_y - camera.y;
-    if (fabsf(dy) > 32.0f) { // 只有垂直距离超过一个瓦片时才跟随
-        camera.y += dy * camera.follow_speed * 0.3f; // 垂直跟随更慢
+    // 竖直方向跟随 - 死区更大，速度更慢
+    if (screen_knight_y < dead_zone_top || screen_knight_y > dead_zone_bottom) {
+        float dy = target_camera_y - camera.y;
+        float distance_factor_y = fabsf(dy) / 100.0f + 1.0f;
+        float dynamic_speed_y = camera.follow_speed * CAMERA_VERTICAL_SPEED_SCALE * distance_factor_y;
+        if (dynamic_speed_y > 0.15f) dynamic_speed_y = 0.15f; // 限制最大竖直速度
+        camera.y += dy * dynamic_speed_y;
     }
     
     // 限制摄像机边界（不能超出地图范围）

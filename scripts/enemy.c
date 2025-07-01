@@ -14,7 +14,6 @@ int enemy_count = 0;
 
 // 敌人物理常量
 #define TILE_SIZE 16
-#define GRAVITY 0.5f
 #define MAX_FALL_SPEED 10.0f
 
 // 栗子小子常量
@@ -98,7 +97,7 @@ int check_enemy_collision(Enemy* enemy, float new_x, float new_y) {
     
     // 使用block_type判断所有地面类型
     BlockType block_type = get_block_type(grid_x, grid_y);
-    if (block_type == BLOCK_NORMAL || block_type == BLOCK_REWARD ||
+    if (block_type == BLOCK_NORMAL ||  
         block_type == BLOCK_GRASS || block_type == BLOCK_MUD ||
         block_type == BLOCK_ENEMY_BARRIER) {
         return 1; // 碰撞（敌人会被屏障阻挡）

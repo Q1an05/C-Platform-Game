@@ -37,18 +37,24 @@ BlockType get_block_type(int map_x, int map_y) {
     // 检查地图数据
     char tile = game_map[map_y][map_x];
     
-    if (tile == '?') {
-        return BLOCK_REWARD;  // 奖励方块
-    } else if (tile == 'G') {
+    if (tile == 'G') {
         return BLOCK_GRASS;  // 草地方块
     } else if (tile == 'M') {
         return BLOCK_MUD;    // 泥土方块
     } else if (tile == '#') {
-        return BLOCK_NORMAL; // 普通砖块（可选）
-    } else if (tile == 'T') {
+        return BLOCK_NORMAL; // 普通砖块
+    } else if (tile == 't') {
         return BLOCK_GOAL;   // 通关方块
     } else if (tile == 'B') {
-        return BLOCK_ENEMY_BARRIER;  // 敌人屏障（不可见）
+        return BLOCK_ENEMY_BARRIER;  // 敌人屏障
+    } else if (tile == 'F') {
+        return BLOCK_DOUBLE_JUMP;    // 二连跳奖励方块
+    } else if (tile == 'D') {
+        return BLOCK_DASH;           // 冲刺奖励方块
+    } else if (tile == 'T') {
+        return BLOCK_TRAP;          // 陷阱方块
+    } else if (tile == 'S') {
+        return BLOCK_SAVE;          // 存档点方块
     }
     
     return BLOCK_NONE;  // 空地
@@ -85,5 +91,29 @@ int is_block_hit(int map_x, int map_y) {
         return block_states[map_y][map_x];
     }
     
+    return 0;
+}
+
+// 二连跳奖励方块消失机制
+int collect_double_jump_block(int map_x, int map_y) {
+    if (map_x < 0 || map_x >= MAP_WIDTH || map_y < 0 || map_y >= MAP_HEIGHT) {
+        return 0;
+    }
+    if (game_map[map_y][map_x] == 'F') {
+        game_map[map_y][map_x] = ' '; // 方块消失
+        return 1;
+    }
+    return 0;
+}
+
+// 冲刺奖励方块消失机制
+int collect_dash_block(int map_x, int map_y) {
+    if (map_x < 0 || map_x >= MAP_WIDTH || map_y < 0 || map_y >= MAP_HEIGHT) {
+        return 0;
+    }
+    if (game_map[map_y][map_x] == 'D') {
+        game_map[map_y][map_x] = ' ';
+        return 1;
+    }
     return 0;
 } 

@@ -4,6 +4,22 @@
 #ifndef KNIGHT_H
 #define KNIGHT_H
 
+
+// 骑士物理常量
+#define KNIGHT_ACCELERATION 0.35f
+#define KNIGHT_WIDTH 15             // 宽度15像素
+#define KNIGHT_HEIGHT 20            // 高度20像素
+
+// 通用物理常量
+#define GROUND_FRICTION 0.10f
+#define AIR_FRICTION 0.05f
+#define GRAVITY 0.4f
+#define JUMP_FORCE -7.0f
+#define MAX_FALL_SPEED 10.0f
+#define TILE_SIZE 16
+#define KNIGHT_MAX_SPEED 2.2f
+#define DASH_SPEED 6.0f
+
 // 骑士动画状态枚举
 typedef enum {
     KNIGHT_ANIM_IDLE,    // 静止动画
@@ -33,6 +49,15 @@ typedef struct {
     int is_taking_damage;  // 是否正在受击（播放受击动画）
     int is_dying;          // 是否正在死亡（播放死亡动画）
     float state_timer;     // 状态计时器（用于控制受击/死亡动画时长）
+    
+    // 二连跳相关
+    int can_double_jump;   // 是否获得二连跳能力
+    int double_jump_used;  // 本次空中是否已用过二连跳
+    // 冲刺相关
+    int can_dash;          // 是否获得冲刺能力
+    int is_dashing;        // 当前是否正在冲刺
+    float dash_timer;      // 冲刺剩余时间
+    float dash_cooldown;   // 冲刺冷却剩余时间
 } Knight;
 
 // 全局骑士对象（允许外部模块访问）
@@ -64,5 +89,9 @@ int check_collision(float x, float y); // 检查指定位置是否有碰撞
 int check_ground_collision(float x, float y); // 检查骑士脚底是否碰到地面
 int check_ceiling_collision(float x, float y); // 检查骑士头顶是否碰到天花板
 void update_knight_horizontal_movement(); // 更新骑士的水平速度
+
+void knight_enable_double_jump(); // 获得二连跳能力
+void knight_enable_dash();        // 获得冲刺能力
+void knight_dash();                // 执行冲刺
 
 #endif // KNIGHT_H 
