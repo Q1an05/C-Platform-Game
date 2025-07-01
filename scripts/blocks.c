@@ -39,6 +39,8 @@ BlockType get_block_type(int map_x, int map_y) {
         return BLOCK_TRAP;          // 陷阱方块
     } else if (tile == 'S') {
         return BLOCK_SAVE;          // 存档点方块
+    } else if (tile == 'C') {
+        return BLOCK_CAMERA_MOVE;    // 镜头移动方块
     }
     
     return BLOCK_NONE;  // 空地

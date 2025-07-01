@@ -11,7 +11,7 @@
 #define KNIGHT_HEIGHT 20            // 高度20像素
 
 // 通用物理常量
-#define GROUND_FRICTION 0.10f
+#define GROUND_FRICTION 0.14f
 #define AIR_FRICTION 0.05f
 #define GRAVITY 0.4f
 #define JUMP_FORCE -7.0f

@@ -15,6 +15,8 @@ Camera camera;
 #define CAMERA_VERTICAL_DEAD_ZONE 126.0f   // 竖直方向死区更大
 #define CAMERA_VERTICAL_SPEED_SCALE 0.15f // 竖直方向跟随速度更慢
 
+float camera_offset_x = 0.0f;
+
 // 初始化摄像机
 void init_camera(int screen_width, int screen_height) {
     camera.x = 0.0f;
@@ -68,6 +70,9 @@ void update_camera(float target_x, float target_y) {
     if (max_camera_y < 0) max_camera_y = 0;
     if (camera.y < 0) camera.y = 0;
     if (camera.y > max_camera_y) camera.y = max_camera_y;
+
+    // 镜头偏移（如镜头移动方块）
+    camera.x += camera_offset_x;
 }
 
 // 获取摄像机偏移量

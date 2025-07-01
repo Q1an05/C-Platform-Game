@@ -15,7 +15,8 @@ typedef enum {
     BLOCK_DOUBLE_JUMP,     // 二连跳奖励方块
     BLOCK_DASH,             // 冲刺奖励方块
     BLOCK_TRAP,             // 陷阱方块（透明，不可见，角色触碰扣血回到起点）
-    BLOCK_SAVE              // 存档点方块（透明，不可见，角色触碰后记录当前位置）
+    BLOCK_SAVE,             // 存档点方块（透明，不可见，角色触碰后记录当前位置）
+    BLOCK_CAMERA_MOVE        // 镜头移动方块（不可见，角色碰撞时触发摄像机移动）
 } BlockType;
 
 // 方块结构体

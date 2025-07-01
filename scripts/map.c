@@ -16,7 +16,7 @@ char game_map[MAP_HEIGHT][MAP_WIDTH+1] = {
     "                                             M                                             ",
     "                                         M   M                                             ",
     "                                     M   M   M                                             ",
-    "              B    E    B        M   M   M   M      F         SSS                      t   ",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG           GGGGGGGGGGGGG",
-    "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTTTTTTTTTTTMMMMMMMMMMMMM"
+    "              B    E    B        M   M   M   M      F       SSSCCCC                    t   ",
+    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG   GGGGGGGGG            GGGGGGGGGGGGG",
+    "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTTTMMMMMMMMMTTTTTTTTTTTTMMMMMMMMMMMMM"
 }; 

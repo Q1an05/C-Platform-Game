@@ -6,6 +6,7 @@
 #include "blocks.h"
 #include <stdio.h>
 #include <math.h>
+#include "camera.h"
 
 // 全局骑士对象
 Knight knight;
@@ -342,6 +343,14 @@ void update_knight() {
             knight_take_damage();
             printf("骑士踩到陷阱，死亡！\n");
         }
+    }
+
+    // 检查是否到达镜头移动方块
+    extern float camera_offset_x;
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_CAMERA_MOVE) {
+        camera_offset_x = 15;
+    } else {
+        camera_offset_x = 0;
     }
 }
 

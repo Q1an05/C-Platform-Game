@@ -16,6 +16,9 @@ typedef struct {
 // 全局摄像机对象
 extern Camera camera;
 
+// 全局摄像机额外偏移变量
+extern float camera_offset_x;
+
 // 摄像机相关函数接口
 void init_camera(int screen_width, int screen_height);  // 初始化摄像机
 void update_camera(float target_x, float target_y);     // 更新摄像机位置
