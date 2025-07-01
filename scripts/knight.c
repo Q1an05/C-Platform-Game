@@ -276,8 +276,6 @@ void update_knight() {
             knight.vy = 0;
             knight.on_ground = 0;
             
-            // 检查是否撞击奖励方块
-            check_block_collision();
         } else {
             knight.y = new_y;
             knight.on_ground = 0;
@@ -374,33 +372,6 @@ void get_knight_position(float* x, float* y) {
 void get_knight_size(int* w, int* h) {
     *w = knight.width;
     *h = knight.height;
-}
-
-// 检查骑士是否撞击奖励方块
-int check_block_collision() {
-    if (!knight.alive) return 0;
-    
-    // 计算骑士头部中心的格子坐标
-    float head_center_x = knight.x + knight.width / 2.0f;
-    float head_y = knight.y;
-    
-    int grid_x = (int)(head_center_x / TILE_SIZE);
-    int grid_y = (int)(head_y / TILE_SIZE);
-    
-    // 检查是否在地图范围内
-    if (grid_x < 0 || grid_x >= MAP_WIDTH || grid_y < 0 || grid_y >= MAP_HEIGHT) {
-        return 0;
-    }
-    
-    // 检查是否是奖励方块
-    if (game_map[grid_y][grid_x] == '?') {
-        // 撞击奖励方块
-        hit_block(grid_x, grid_y);
-        printf("骑士撞击奖励方块！\n");
-        return 1;
-    }
-    
-    return 0;
 }
 
 // 骑士受伤

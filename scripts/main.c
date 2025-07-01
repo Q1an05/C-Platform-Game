@@ -42,7 +42,6 @@ int main() {
     
     init_knight();
     init_input();
-    init_blocks();
     init_enemies();
 
     bool quit = false;
