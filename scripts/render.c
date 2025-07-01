@@ -5,7 +5,7 @@
 #include <SDL_image.h>
 #include <math.h>
 #include "map.h"
-#include "mario.h"
+#include "knight.h"
 #include "camera.h"
 #include "blocks.h"
 #include "enemy.h"
@@ -22,6 +22,12 @@ static SDL_Texture* mud_texture = NULL;
 // 角色动画纹理数组
 static SDL_Texture* player_idle_textures[4];   // idle动画4帧
 static SDL_Texture* player_run_textures[16];   // run动画16帧
+static SDL_Texture* player_hit_textures[4];    // hit动画4帧
+static SDL_Texture* player_death_textures[4];  // death动画4帧
+
+// 敌人动画纹理数组
+static SDL_Texture* enemy_idle_textures[4];    // enemy idle动画4帧
+static SDL_Texture* enemy_hit_textures[4];     // enemy hit动画4帧
 
 // 每个格子的像素大小
 #define TILE_SIZE 16
@@ -33,7 +39,7 @@ static SDL_Texture* player_run_textures[16];   // run动画16帧
 // 颜色定义
 SDL_Color COLOR_BG       = {135, 206, 235, 255}; // 天空蓝
 SDL_Color COLOR_WALL     = {139, 69, 19, 255};   // 棕色（砖块）
-SDL_Color COLOR_MARIO    = {255, 0, 0, 255};     // 红色（马里奥）
+SDL_Color COLOR_KNIGHT   = {255, 0, 0, 255};     // 红色（骑士）
 SDL_Color COLOR_REWARD   = {255, 255, 0, 255};   // 黄色（奖励方块）
 SDL_Color COLOR_USED     = {160, 160, 160, 255}; // 灰色（用过的方块）
 SDL_Color COLOR_ENEMY    = {101, 67, 33, 255};   // 棕色（敌人）
@@ -150,11 +156,11 @@ int init_render() {
         return 0;
     }
     
-    // 16:9窗口，缩小视野
-    int window_width = CAMERA_VIEW_WIDTH * TILE_SIZE;
-    int window_height = CAMERA_VIEW_HEIGHT * TILE_SIZE;
+    // 16:9窗口，默认大小1600x900
+    int window_width = 1600;
+    int window_height = 900;
     
-    gWindow = SDL_CreateWindow("超级玛丽", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    gWindow = SDL_CreateWindow("超级骑士", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         window_width, window_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (!gWindow) {
         SDL_Log("SDL_CreateWindow Error: %s", SDL_GetError());
@@ -165,8 +171,13 @@ int init_render() {
         SDL_Log("SDL_CreateRenderer Error: %s", SDL_GetError());
         return 0;
     }
-    // 设置逻辑分辨率，自动拉伸适配窗口
-    SDL_RenderSetLogicalSize(gRenderer, window_width, window_height);
+    // 设置逻辑分辨率，保持固定比例缩放
+    int logical_width = CAMERA_VIEW_WIDTH * TILE_SIZE;  // 320
+    int logical_height = CAMERA_VIEW_HEIGHT * TILE_SIZE; // 176
+    SDL_RenderSetLogicalSize(gRenderer, logical_width, logical_height);
+    
+    // 设置缩放质量为最佳
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
     
     // 加载纹理
     if (!load_textures()) {
@@ -174,12 +185,18 @@ int init_render() {
         return 0;
     }
     
-    // 初始化摄像机
-    init_camera(window_width, window_height);
+    // 初始化摄像机（使用逻辑分辨率）
+    init_camera(logical_width, logical_height);
     
     // 加载角色动画纹理
     if (!load_player_animations()) {
         printf("角色动画纹理加载失败！\n");
+        return 0;
+    }
+    
+    // 加载敌人动画纹理
+    if (!load_enemy_animations()) {
+        printf("敌人动画纹理加载失败！\n");
         return 0;
     }
     
@@ -263,53 +280,93 @@ void render_game() {
         
         // 根据敌人状态绘制
         if (enemy_state == ENEMY_STATE_STOMPED) {
-            draw_colored_rect(gRenderer, enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, COLOR_ENEMY_DEAD);
+            // 即使是被踩死状态，也要尝试使用动画纹理渲染
+            EnemyAnimationState anim_state = get_enemy_animation_state(i);
+            int anim_frame = get_enemy_animation_frame(i);
+            int direction = get_enemy_direction(i);
+            
+            // 获取当前帧的纹理
+            SDL_Texture* enemy_texture = get_enemy_animation_texture(anim_state, anim_frame);
+            
+            if (enemy_texture) {
+                // 使用动画纹理渲染，支持水平翻转
+                // direction为-1时翻转（面向左），为1时不翻转（面向右）
+                draw_texture_flip(gRenderer, enemy_texture, 
+                                 enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, 
+                                 direction == -1);
+            } else {
+                // 备用：如果纹理加载失败，使用灰色矩形表示死亡状态
+                draw_colored_rect(gRenderer, enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, COLOR_ENEMY_DEAD);
+            }
         } else {
-            draw_colored_rect(gRenderer, enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, COLOR_ENEMY);
+            // 获取敌人动画信息
+            EnemyAnimationState anim_state = get_enemy_animation_state(i);
+            int anim_frame = get_enemy_animation_frame(i);
+            int direction = get_enemy_direction(i);
+            
+            // 获取当前帧的纹理
+            SDL_Texture* enemy_texture = get_enemy_animation_texture(anim_state, anim_frame);
+            
+            if (enemy_texture) {
+                // 使用动画纹理渲染，支持水平翻转
+                // direction为-1时翻转（面向左），为1时不翻转（面向右）
+                draw_texture_flip(gRenderer, enemy_texture, 
+                                 enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, 
+                                 direction == -1);
+            } else {
+                // 备用：如果纹理加载失败，使用纯色矩形
+                draw_colored_rect(gRenderer, enemyRect.x, enemyRect.y, enemyRect.w, enemyRect.h, COLOR_ENEMY);
+            }
         }
     }
 
-    // 绘制马里奥（最后绘制，确保在前景）
-    float mario_world_x, mario_world_y;
-    int mario_w, mario_h;
-    get_mario_position(&mario_world_x, &mario_world_y);
-    get_mario_size(&mario_w, &mario_h);
+    // 绘制骑士（最后绘制，确保在前景）
+    float knight_world_x, knight_world_y;
+    int knight_w, knight_h;
+    get_knight_position(&knight_world_x, &knight_world_y);
+    get_knight_size(&knight_w, &knight_h);
     
     // 计算屏幕坐标，使用平滑的浮点数计算
-    SDL_Rect marioRect = {
-        (int)(mario_world_x - render_offset_x), 
-        (int)(mario_world_y - render_offset_y), 
-        mario_w, 
-        mario_h
+    SDL_Rect knightRect = {
+        (int)(knight_world_x - render_offset_x), 
+        (int)(knight_world_y - render_offset_y), 
+        knight_w, 
+        knight_h
     };
     
-    // 如果马里奥无敌，实现闪烁效果
+    // 决定是否绘制骑士（受击时不闪烁，只有无敌且不在播放受击动画时才闪烁）
     int should_draw = 1;
-    if (mario_is_invulnerable()) {
-        // 使用简单的时间计算实现闪烁
-        static int flash_counter = 0;
-        flash_counter++;
-        should_draw = (flash_counter / 6) % 2; // 每6帧切换一次
+    if (knight_is_invulnerable()) {
+        // 获取骑士动画状态
+        KnightAnimationState current_anim_state = get_knight_animation_state();
+        
+        // 只有在无敌状态下且不在播放受击或死亡动画时才闪烁
+        if (current_anim_state != KNIGHT_ANIM_HIT && current_anim_state != KNIGHT_ANIM_DEATH) {
+            // 使用简单的时间计算实现闪烁
+            static int flash_counter = 0;
+            flash_counter++;
+            should_draw = (flash_counter / 6) % 2; // 每6帧切换一次
+        }
     }
     
     if (should_draw) {
         // 获取当前动画状态和帧
-        MarioAnimationState anim_state = get_mario_animation_state();
-        int anim_frame = get_mario_animation_frame();
-        int facing_right = is_mario_facing_right();
+        KnightAnimationState anim_state = get_knight_animation_state();
+        int anim_frame = get_knight_animation_frame();
+        int facing_right = is_knight_facing_right();
         
         // 获取当前帧的纹理
-        SDL_Texture* mario_texture = get_player_animation_texture(anim_state, anim_frame);
+        SDL_Texture* knight_texture = get_player_animation_texture(anim_state, anim_frame);
         
-        if (mario_texture) {
+        if (knight_texture) {
             // 使用动画纹理渲染，支持水平翻转
             // 注意：facing_right为0时翻转，为1时不翻转
-            draw_texture_flip(gRenderer, mario_texture, 
-                             marioRect.x, marioRect.y, marioRect.w, marioRect.h, 
+            draw_texture_flip(gRenderer, knight_texture, 
+                             knightRect.x, knightRect.y, knightRect.w, knightRect.h, 
                              !facing_right);
         } else {
             // 备用：如果纹理加载失败，使用纯色矩形
-            draw_colored_rect(gRenderer, marioRect.x, marioRect.y, marioRect.w, marioRect.h, COLOR_MARIO);
+            draw_colored_rect(gRenderer, knightRect.x, knightRect.y, knightRect.w, knightRect.h, COLOR_KNIGHT);
         }
     }
 
@@ -320,6 +377,7 @@ void render_game() {
 void cleanup_render() {
     cleanup_textures();  // 清理纹理
     cleanup_player_animations();  // 清理角色动画纹理
+    cleanup_enemy_animations();   // 清理敌人动画纹理
     if (gRenderer) SDL_DestroyRenderer(gRenderer);
     if (gWindow) SDL_DestroyWindow(gWindow);
     SDL_Quit();
@@ -350,7 +408,27 @@ int load_player_animations() {
         }
     }
     
-    printf("角色动画纹理加载成功！(idle: 4帧, run: 16帧)\n");
+    // 加载hit动画帧
+    for (int i = 0; i < 4; i++) {
+        snprintf(filename, sizeof(filename), "assets/sprites/player/player_hit%d.png", i + 1);
+        player_hit_textures[i] = load_texture_from_file(filename);
+        if (!player_hit_textures[i]) {
+            printf("无法加载hit动画帧 %d: %s\n", i + 1, filename);
+            return 0;
+        }
+    }
+    
+    // 加载death动画帧
+    for (int i = 0; i < 4; i++) {
+        snprintf(filename, sizeof(filename), "assets/sprites/player/player_death%d.png", i + 1);
+        player_death_textures[i] = load_texture_from_file(filename);
+        if (!player_death_textures[i]) {
+            printf("无法加载death动画帧 %d: %s\n", i + 1, filename);
+            return 0;
+        }
+    }
+    
+    printf("角色动画纹理加载成功！(idle: 4帧, run: 16帧, hit: 4帧, death: 4帧)\n");
     return 1;
 }
 
@@ -371,20 +449,107 @@ void cleanup_player_animations() {
             player_run_textures[i] = NULL;
         }
     }
+    
+    // 清理hit动画纹理
+    for (int i = 0; i < 4; i++) {
+        if (player_hit_textures[i]) {
+            SDL_DestroyTexture(player_hit_textures[i]);
+            player_hit_textures[i] = NULL;
+        }
+    }
+    
+    // 清理death动画纹理
+    for (int i = 0; i < 4; i++) {
+        if (player_death_textures[i]) {
+            SDL_DestroyTexture(player_death_textures[i]);
+            player_death_textures[i] = NULL;
+        }
+    }
 }
 
 // 获取指定动画状态和帧的纹理
-SDL_Texture* get_player_animation_texture(MarioAnimationState state, int frame) {
-    if (state == MARIO_ANIM_IDLE) {
+SDL_Texture* get_player_animation_texture(KnightAnimationState state, int frame) {
+    if (state == KNIGHT_ANIM_IDLE) {
         if (frame >= 0 && frame < 4) {
             return player_idle_textures[frame];
         }
-    } else if (state == MARIO_ANIM_RUN) {
+    } else if (state == KNIGHT_ANIM_RUN) {
         if (frame >= 0 && frame < 16) {
             return player_run_textures[frame];
+        }
+    } else if (state == KNIGHT_ANIM_HIT) {
+        if (frame >= 0 && frame < 4) {
+            return player_hit_textures[frame];
+        }
+    } else if (state == KNIGHT_ANIM_DEATH) {
+        if (frame >= 0 && frame < 4) {
+            return player_death_textures[frame];
         }
     }
     
     // 默认返回第一帧idle纹理
     return player_idle_textures[0];
+}
+
+// 加载敌人动画纹理
+int load_enemy_animations() {
+    char filename[256];
+    
+    // 加载enemy idle动画帧
+    for (int i = 0; i < 4; i++) {
+        snprintf(filename, sizeof(filename), "assets/sprites/enemy/enemy_idle%d.png", i + 1);
+        enemy_idle_textures[i] = load_texture_from_file(filename);
+        if (!enemy_idle_textures[i]) {
+            printf("无法加载enemy idle动画帧 %d: %s\n", i + 1, filename);
+            return 0;
+        }
+    }
+    
+    // 加载enemy hit动画帧
+    for (int i = 0; i < 4; i++) {
+        snprintf(filename, sizeof(filename), "assets/sprites/enemy/enemy_hit%d.png", i + 1);
+        enemy_hit_textures[i] = load_texture_from_file(filename);
+        if (!enemy_hit_textures[i]) {
+            printf("无法加载enemy hit动画帧 %d: %s\n", i + 1, filename);
+            return 0;
+        }
+    }
+    
+    printf("敌人动画纹理加载成功！(idle: 4帧, hit: 4帧)\n");
+    return 1;
+}
+
+// 清理敌人动画纹理
+void cleanup_enemy_animations() {
+    // 清理enemy idle动画纹理
+    for (int i = 0; i < 4; i++) {
+        if (enemy_idle_textures[i]) {
+            SDL_DestroyTexture(enemy_idle_textures[i]);
+            enemy_idle_textures[i] = NULL;
+        }
+    }
+    
+    // 清理enemy hit动画纹理
+    for (int i = 0; i < 4; i++) {
+        if (enemy_hit_textures[i]) {
+            SDL_DestroyTexture(enemy_hit_textures[i]);
+            enemy_hit_textures[i] = NULL;
+        }
+    }
+}
+
+// 获取指定敌人动画状态和帧的纹理
+SDL_Texture* get_enemy_animation_texture(EnemyAnimationState state, int frame) {
+    if (state == ENEMY_ANIM_IDLE) {
+        if (frame >= 0 && frame < 4) {
+            return enemy_idle_textures[frame];
+        }
+    } else if (state == ENEMY_ANIM_HIT) {
+        if (frame >= 0 && frame < 4) {
+            return enemy_hit_textures[frame];
+        }
+    }
+    
+    // 默认返回第一帧idle纹理
+    return enemy_idle_textures[0];
 } 

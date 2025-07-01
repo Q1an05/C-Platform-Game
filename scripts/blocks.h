@@ -11,7 +11,8 @@ typedef enum {
     BLOCK_REWARD,   // 奖励方块（问号方块）
     BLOCK_GOAL,     // 通关方块
     BLOCK_GRASS,    // 草地方块（地表）
-    BLOCK_MUD       // 泥土方块（地下）
+    BLOCK_MUD,      // 泥土方块（地下）
+    BLOCK_ENEMY_BARRIER  // 敌人屏障（不可见，只阻挡敌人）
 } BlockType;
 
 // 方块状态枚举

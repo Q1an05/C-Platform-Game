@@ -12,5 +12,7 @@
 *~
 *.swp
 
-# 可执行文件（如mario）
-mario 
+# 可执行文件（如knight）
+knight
+mario_game
+knight_game 

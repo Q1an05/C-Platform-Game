@@ -3,7 +3,7 @@
 
 #include "enemy.h"
 #include "map.h"
-#include "mario.h"
+#include "knight.h"
 #include <stdio.h>
 #include <math.h>
 #include "blocks.h" // 确保包含blocks.h
@@ -75,6 +75,13 @@ void add_enemy(EnemyType type, float x, float y) {
             break;
     }
     
+    // 初始化动画状态
+    enemy->anim_state = ENEMY_ANIM_IDLE;
+    enemy->anim_timer = 0.0f;
+    enemy->anim_frame = 0;
+    enemy->is_taking_damage = 0;
+    enemy->hit_timer = 0.0f;
+    
     enemy_count++;
 }
 
@@ -92,8 +99,9 @@ int check_enemy_collision(Enemy* enemy, float new_x, float new_y) {
     // 使用block_type判断所有地面类型
     BlockType block_type = get_block_type(grid_x, grid_y);
     if (block_type == BLOCK_NORMAL || block_type == BLOCK_REWARD ||
-        block_type == BLOCK_GRASS || block_type == BLOCK_MUD) {
-        return 1; // 碰撞
+        block_type == BLOCK_GRASS || block_type == BLOCK_MUD ||
+        block_type == BLOCK_ENEMY_BARRIER) {
+        return 1; // 碰撞（敌人会被屏障阻挡）
     }
     
     return 0; // 无碰撞
@@ -205,12 +213,61 @@ void update_enemy_ai(Enemy* enemy) {
     }
 }
 
+// 更新敌人动画
+void update_enemy_animation(Enemy* enemy) {
+    // 更新受击状态计时器
+    if (enemy->hit_timer > 0) {
+        enemy->hit_timer -= 1.0f / 60.0f; // 假设60FPS
+        if (enemy->hit_timer <= 0) {
+            enemy->hit_timer = 0.0f;
+            enemy->is_taking_damage = 0;
+        }
+    }
+    
+    // 更新动画状态
+    EnemyAnimationState new_anim_state;
+    if (enemy->is_taking_damage) {
+        new_anim_state = ENEMY_ANIM_HIT;   // 受击动画
+    } else {
+        new_anim_state = ENEMY_ANIM_IDLE;  // 默认动画
+    }
+    
+    // 如果动画状态改变，重置动画
+    if (new_anim_state != enemy->anim_state) {
+        enemy->anim_state = new_anim_state;
+        enemy->anim_timer = 0.0f;
+        enemy->anim_frame = 0;
+    }
+    
+    // 更新动画帧
+    const float ANIM_SPEED = 0.15f; // 敌人动画播放速度（每帧0.15秒，比角色慢一点）
+    enemy->anim_timer += 1.0f / 60.0f; // 假设60FPS
+    
+    if (enemy->anim_timer >= ANIM_SPEED) {
+        enemy->anim_timer = 0.0f;
+        
+        // 获取当前动画的最大帧数
+        int max_frames = 4; // 所有敌人动画都是4帧
+        
+        // 对于受击动画，只播放一次
+        if (enemy->anim_state == ENEMY_ANIM_HIT) {
+            enemy->anim_frame++;
+            if (enemy->anim_frame >= max_frames) {
+                enemy->anim_frame = max_frames - 1; // 停留在最后一帧
+            }
+        } else {
+            enemy->anim_frame = (enemy->anim_frame + 1) % max_frames; // 循环播放
+        }
+    }
+}
+
 // 更新所有敌人
 void update_enemies() {
     for (int i = 0; i < enemy_count; i++) {
         if (enemies[i].alive) {
             update_enemy_ai(&enemies[i]);
             update_enemy_physics(&enemies[i]);
+            update_enemy_animation(&enemies[i]);
         }
     }
 }
@@ -221,6 +278,10 @@ void stomp_enemy(int enemy_index) {
     
     Enemy* enemy = &enemies[enemy_index];
     if (enemy->state == ENEMY_STATE_ALIVE) {
+        // 先播放受击动画
+        enemy->is_taking_damage = 1;
+        enemy->hit_timer = DEATH_ANIMATION_TIME; // 受击动画持续整个死亡过程
+        
         enemy->state = ENEMY_STATE_STOMPED;
         enemy->death_timer = 0;
         
@@ -238,15 +299,15 @@ void kill_enemy(int enemy_index) {
     enemy->alive = 0;
 }
 
-// 检查马里奥与敌人的碰撞
-int check_mario_enemy_collision() {
-    // 如果马里奥处于无敌状态，不检查碰撞
-    if (mario_is_invulnerable()) return 0;
+// 检查骑士与敌人的碰撞
+int check_knight_enemy_collision() {
+    // 如果骑士处于无敌状态，不检查碰撞
+    if (knight_is_invulnerable()) return 0;
     
-    float mario_x, mario_y;
-    int mario_w, mario_h;
-    get_mario_position(&mario_x, &mario_y);
-    get_mario_size(&mario_w, &mario_h);
+    float knight_x, knight_y;
+    int knight_w, knight_h;
+    get_knight_position(&knight_x, &knight_y);
+    get_knight_size(&knight_w, &knight_h);
     
     for (int i = 0; i < enemy_count; i++) {
         Enemy* enemy = &enemies[i];
@@ -254,27 +315,27 @@ int check_mario_enemy_collision() {
         if (!enemy->alive || enemy->state != ENEMY_STATE_ALIVE) continue;
         
         // 简单的矩形碰撞检测
-        if (mario_x < enemy->x + enemy->width &&
-            mario_x + mario_w > enemy->x &&
-            mario_y < enemy->y + enemy->height &&
-            mario_y + mario_h > enemy->y) {
+        if (knight_x < enemy->x + enemy->width &&
+            knight_x + knight_w > enemy->x &&
+            knight_y < enemy->y + enemy->height &&
+            knight_y + knight_h > enemy->y) {
             
             // 检查是否是从上方踩踏
-            float mario_bottom = mario_y + mario_h;
+            float knight_bottom = knight_y + knight_h;
             float enemy_top = enemy->y;
             
-            // 如果马里奥的底部接近敌人的顶部，并且马里奥在下降或接近地面
-            if (mario_bottom <= enemy_top + 10 && mario_bottom >= enemy_top - 4) {
+            // 如果骑士的底部接近敌人的顶部，并且骑士在下降或接近地面
+            if (knight_bottom <= enemy_top + 10 && knight_bottom >= enemy_top - 4) {
                 // 踩踏敌人
                 stomp_enemy(i);
                 
-                // 让马里奥弹跳一下
-                mario.vy = -6.0f; // 小幅弹跳
+                // 让骑士弹跳一下
+                knight.vy = -6.0f; // 小幅弹跳
                 
-                return 0; // 不伤害马里奥
+                return 0; // 不伤害骑士
             } else {
-                // 侧面碰撞，马里奥受伤
-                return 1; // 返回1表示马里奥受伤
+                // 侧面碰撞，骑士受伤
+                return 1; // 返回1表示骑士受伤
             }
         }
     }
@@ -317,4 +378,22 @@ int get_alive_enemy_count() {
         if (enemies[i].alive) count++;
     }
     return count;
+}
+
+// 获取敌人动画状态
+EnemyAnimationState get_enemy_animation_state(int index) {
+    if (index < 0 || index >= enemy_count) return ENEMY_ANIM_IDLE;
+    return enemies[index].anim_state;
+}
+
+// 获取敌人动画帧
+int get_enemy_animation_frame(int index) {
+    if (index < 0 || index >= enemy_count) return 0;
+    return enemies[index].anim_frame;
+}
+
+// 获取敌人面向方向
+int get_enemy_direction(int index) {
+    if (index < 0 || index >= enemy_count) return 1;
+    return enemies[index].direction;
 } 

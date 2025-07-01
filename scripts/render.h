@@ -6,7 +6,8 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
-#include "mario.h"
+#include "knight.h"
+#include "enemy.h"
 
 // 初始化SDL2窗口和渲染器
 int init_render();
@@ -24,7 +25,12 @@ SDL_Texture* get_mud_texture();     // 获取泥土纹理
 // 角色动画纹理管理函数
 int load_player_animations();                              // 加载玩家动画纹理
 void cleanup_player_animations();                          // 清理玩家动画纹理
-SDL_Texture* get_player_animation_texture(MarioAnimationState state, int frame); // 获取指定动画帧纹理
+SDL_Texture* get_player_animation_texture(KnightAnimationState state, int frame); // 获取指定动画帧纹理
+
+// 敌人动画纹理管理函数
+int load_enemy_animations();                               // 加载敌人动画纹理
+void cleanup_enemy_animations();                           // 清理敌人动画纹理
+SDL_Texture* get_enemy_animation_texture(EnemyAnimationState state, int frame); // 获取指定敌人动画帧纹理
 
 // 提供全局访问的窗口和渲染器指针（可选）
 extern SDL_Window* gWindow;

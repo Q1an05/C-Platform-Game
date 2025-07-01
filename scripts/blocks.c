@@ -47,6 +47,8 @@ BlockType get_block_type(int map_x, int map_y) {
         return BLOCK_NORMAL; // 普通砖块（可选）
     } else if (tile == 'T') {
         return BLOCK_GOAL;   // 通关方块
+    } else if (tile == 'B') {
+        return BLOCK_ENEMY_BARRIER;  // 敌人屏障（不可见）
     }
     
     return BLOCK_NONE;  // 空地

@@ -25,17 +25,17 @@ void init_camera(int screen_width, int screen_height) {
 
 // 更新摄像机位置（跟随目标）
 void update_camera(float target_x, float target_y) {
-    // 计算摄像机应该跟随的目标位置（让马里奥在屏幕中央偏左，垂直方向抬高一格）
+    // 计算摄像机应该跟随的目标位置（让骑士在屏幕中央偏左，垂直方向往上抬一格）
     float target_camera_x = target_x - camera.screen_width / 3.0f;
     float target_camera_y = target_y - camera.screen_height / 2.0f - TILE_SIZE;
     
     // 死区检测（只有马里奥离开死区时摄像机才移动）
-    float screen_mario_x = target_x - camera.x;
+    float screen_knight_x = target_x - camera.x;
     float dead_zone_left = camera.screen_width / 2.0f - camera.dead_zone_width / 2.0f;
     float dead_zone_right = camera.screen_width / 2.0f + camera.dead_zone_width / 2.0f;
     
     // 水平方向跟随 - 使用动态跟随速度
-    if (screen_mario_x < dead_zone_left || screen_mario_x > dead_zone_right) {
+    if (screen_knight_x < dead_zone_left || screen_knight_x > dead_zone_right) {
         float dx = target_camera_x - camera.x;
         // 距离越远，跟随速度越快（动态跟随）
         float distance_factor = fabsf(dx) / 100.0f + 1.0f;
@@ -56,7 +56,9 @@ void update_camera(float target_x, float target_y) {
     if (camera.x < 0) camera.x = 0;
     if (camera.x > max_camera_x) camera.x = max_camera_x;
     
-    float max_camera_y = (MAP_HEIGHT * TILE_SIZE) - camera.screen_height - TILE_SIZE;
+    float max_camera_y = (MAP_HEIGHT * TILE_SIZE) - camera.screen_height;
+    // 确保摄像机不会显示地图底部之外的区域
+    if (max_camera_y < 0) max_camera_y = 0;
     if (camera.y < 0) camera.y = 0;
     if (camera.y > max_camera_y) camera.y = max_camera_y;
 }

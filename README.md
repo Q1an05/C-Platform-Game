@@ -118,10 +118,10 @@ brew install sdl2 sdl2_image
 # 按 Cmd+Shift+P -> "Tasks: Run Build Task"
 
 # 方式3：手动编译
-gcc -I/opt/homebrew/include/SDL2 -D_THREAD_SAFE -L/opt/homebrew/lib scripts/*.c -o mario_game -lSDL2
+gcc -I/opt/homebrew/include/SDL2 -D_THREAD_SAFE -L/opt/homebrew/lib scripts/*.c -o knight_game -lSDL2
 
 # 3. 运行游戏
-./mario_game
+./knight_game
 ```
 
 ## 📁 项目结构
@@ -129,7 +129,7 @@ gcc -I/opt/homebrew/include/SDL2 -D_THREAD_SAFE -L/opt/homebrew/lib scripts/*.c 
 小学期作业/
 ├── scripts/               # 所有源代码文件
 │   ├── main.c             # 主程序和游戏循环
-│   ├── mario.c/h          # 马里奥角色逻辑（简化版）
+│   ├── knight.c/h         # 骑士角色逻辑（简化版）
 │   ├── enemy.c/h          # 敌人系统
 │   ├── map.c/h            # 地图数据
 │   ├── render.c/h         # SDL2渲染（纯矩形绘制）
@@ -138,7 +138,7 @@ gcc -I/opt/homebrew/include/SDL2 -D_THREAD_SAFE -L/opt/homebrew/lib scripts/*.c 
 │   └── input.c/h          # 输入处理
 ├── .vscode/
 │   └── tasks.json         # VS Code 编译配置
-├── mario_game             # 编译后的可执行文件（60KB）
+├── knight_game            # 编译后的可执行文件（60KB）
 └── README.md              # 本文件
 ```
 

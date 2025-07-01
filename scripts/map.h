@@ -5,7 +5,7 @@
 #define MAP_H
 
 #define MAP_WIDTH 200
-#define MAP_HEIGHT 10
+#define MAP_HEIGHT 11
 
 // 地图数组声明（每行+1用于字符串结尾）
 extern char game_map[MAP_HEIGHT][MAP_WIDTH+1];

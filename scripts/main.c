@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <SDL.h>
 #include "map.h"
-#include "mario.h"
+#include "knight.h"
 #include "render.h"
 #include "input.h"
 #include "camera.h"
@@ -13,11 +13,11 @@
 #include "enemy.h"
 
 // 移动速度常量
-#define MARIO_SPEED 4.0f
+#define KNIGHT_SPEED 4.0f
 
 // 这里可以包含你自己写的头文件
 // #include "map.h"
-// #include "mario.h"
+// #include "knight.h"
 // #include "render.h"
 // #include "input.h"
 
@@ -27,33 +27,33 @@ bool game_over = false;
 // 处理用户输入（基于input模块的状态）
 void process_input() {
     // 固定移动速度
-    float speed = MARIO_SPEED;
+    float speed = KNIGHT_SPEED;
     
     // 处理移动输入
     if (is_action_pressed(INPUT_LEFT)) {
-        set_mario_target_velocity(-speed);
+        set_knight_target_velocity(-speed);
     } else if (is_action_pressed(INPUT_RIGHT)) {
-        set_mario_target_velocity(speed);
+        set_knight_target_velocity(speed);
     } else {
         // 没有按左右键时，目标速度为0（摩擦力会逐渐减速）
-        set_mario_target_velocity(0);
+        set_knight_target_velocity(0);
     }
     
     // 处理跳跃输入（只在刚按下时跳跃，避免连续跳跃）
     if (is_action_just_pressed(INPUT_JUMP)) {
-        mario_jump();
+        knight_jump();
     }
 }
 
 // 更新游戏状态
 void update_game() {
-    update_mario(); // 更新马里奥状态
+    update_knight(); // 更新骑士状态
     update_enemies(); // 更新敌人状态
     
-    // 检查马里奥与敌人的碰撞
-    if (check_mario_enemy_collision()) {
-        // 马里奥受伤
-        mario_take_damage();
+    // 检查骑士与敌人的碰撞
+    if (check_knight_enemy_collision()) {
+        // 骑士受伤
+        knight_take_damage();
     }
 }
 
@@ -64,7 +64,7 @@ int main() {
         return 1;
     }
     
-    init_mario();
+    init_knight();
     init_input();
     init_blocks();
     init_enemies();
@@ -132,9 +132,9 @@ int main() {
         }
         
         // 最后更新摄像机（在所有逻辑更新完成后）
-        float mario_x, mario_y;
-        get_mario_position(&mario_x, &mario_y);
-        update_camera(mario_x, mario_y);
+        float knight_x, knight_y;
+        get_knight_position(&knight_x, &knight_y);
+        update_camera(knight_x, knight_y);
 
         render_game();
         

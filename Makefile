@@ -1,4 +1,4 @@
-# 超级玛丽游戏 Makefile
+# 超级骑士游戏 Makefile
 
 # 编译器设置
 CC = gcc
@@ -6,11 +6,11 @@ CFLAGS = -std=c99 -Wall
 LDFLAGS = $(shell sdl2-config --cflags --libs) -lSDL2_image
 
 # 源文件（在scripts文件夹中）
-SOURCES = scripts/main.c scripts/mario.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c
-HEADERS = scripts/mario.h scripts/map.h scripts/render.h scripts/input.h scripts/camera.h scripts/blocks.h scripts/enemy.h
+SOURCES = scripts/main.c scripts/knight.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c
+HEADERS = scripts/knight.h scripts/map.h scripts/render.h scripts/input.h scripts/camera.h scripts/blocks.h scripts/enemy.h
 
 # 目标文件
-TARGET = mario_game
+TARGET = knight_game
 
 # 素材文件夹
 ASSETS_DIR = assets/sprites
@@ -44,7 +44,7 @@ install-deps:
 
 # 显示帮助
 help:
-	@echo "超级玛丽游戏 Makefile 使用说明："
+	@echo "超级骑士游戏 Makefile 使用说明："
 	@echo ""
 	@echo "make           - 编译游戏"
 	@echo "make run       - 编译并运行游戏"

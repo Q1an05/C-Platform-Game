@@ -20,6 +20,12 @@ typedef enum {
     ENEMY_STATE_DEAD        // 死亡
 } EnemyState;
 
+// 敌人动画状态枚举
+typedef enum {
+    ENEMY_ANIM_IDLE,        // 默认动画
+    ENEMY_ANIM_HIT          // 受击动画
+} EnemyAnimationState;
+
 // 敌人结构体
 typedef struct {
     float x, y;              // 世界坐标位置
@@ -31,6 +37,13 @@ typedef struct {
     int direction;           // 移动方向（-1=左，1=右）
     float death_timer;       // 死亡动画计时器
     int on_ground;           // 是否在地面上
+    
+    // 动画相关
+    EnemyAnimationState anim_state;  // 当前动画状态
+    float anim_timer;                // 动画计时器
+    int anim_frame;                  // 当前动画帧
+    int is_taking_damage;            // 是否正在受击
+    float hit_timer;                 // 受击状态计时器
 } Enemy;
 
 // 敌人数组和数量
@@ -43,7 +56,7 @@ void init_enemies();                                    // 初始化敌人系统
 void add_enemy(EnemyType type, float x, float y);      // 添加敌人
 void update_enemies();                                  // 更新所有敌人
 void remove_dead_enemies();                             // 移除死亡的敌人
-int check_mario_enemy_collision();                     // 检查马里奥与敌人的碰撞
+int check_knight_enemy_collision();                    // 检查骑士与敌人的碰撞
 void stomp_enemy(int enemy_index);                     // 踩死敌人
 void kill_enemy(int enemy_index);                      // 杀死敌人
 
@@ -55,5 +68,10 @@ int check_enemy_collision(Enemy* enemy, float new_x, float new_y); // 检查敌�
 // 获取敌人信息函数
 void get_enemy_info(int index, float* x, float* y, int* w, int* h, EnemyState* state);
 int get_alive_enemy_count();                           // 获取活着的敌人数量
+
+// 获取敌人动画信息函数
+EnemyAnimationState get_enemy_animation_state(int index);  // 获取敌人动画状态
+int get_enemy_animation_frame(int index);                  // 获取敌人动画帧
+int get_enemy_direction(int index);                        // 获取敌人面向方向
 
 #endif // ENEMY_H 
