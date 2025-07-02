@@ -290,9 +290,11 @@ build_simple.bat run           # 编译、复制DLL并运行游戏
 #### 辅助工具脚本 (Windows)
 
 ```cmd
-diagnose.bat            # 检查环境和依赖问题
-copy_dlls.bat           # 手动复制SDL2运行时库
-find_missing_dlls.bat   # 智能检测缺失的DLL文件
+diagnose.bat                # 检查环境和依赖问题
+auto_fix_dlls.bat          # 智能检测和自动修复所有DLL依赖（推荐）
+copy_all_needed_dlls.bat   # 复制所有可能需要的DLL文件
+copy_dlls.bat              # 手动复制基础SDL2运行时库
+find_missing_dlls.bat      # 智能检测缺失的DLL文件
 ```
 
 ### ⚠️ 常见问题解决

@@ -56,7 +56,7 @@ if %errorlevel% equ 0 (
     echo [SUCCESS] Compilation successful!
     
     echo [INFO] Copying SDL2 runtime libraries...
-    call copy_dlls.bat
+    call copy_all_needed_dlls.bat
     
     echo [INFO] Game ready! You can run: knight_game.exe
     if "%1"=="run" (

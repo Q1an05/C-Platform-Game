@@ -38,13 +38,19 @@ export PATH="/mingw64/bin:$PATH"
 
 **解决方案**：
 ```cmd
-# 方案1: 检测缺失的DLL（推荐先运行）
+# 方案1: 智能自动修复（最推荐）
+auto_fix_dlls.bat
+
+# 方案2: 复制所有可能需要的DLL
+copy_all_needed_dlls.bat
+
+# 方案3: 检测缺失的DLL（推荐先运行）
 find_missing_dlls.bat
 
-# 方案2: 使用自动复制脚本（最简单）
+# 方案4: 使用基础自动复制脚本
 copy_dlls.bat
 
-# 方案3: 构建脚本会自动复制DLL
+# 方案5: 构建脚本会自动复制DLL
 build_simple.bat run
 
 # 方案4: 手动复制主要DLL文件
