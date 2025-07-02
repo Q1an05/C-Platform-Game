@@ -534,3 +534,6 @@ make run
 1. 安装MSYS2: https://www.msys2.org/
 2. 在MSYS2终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
 3. 编译运行: `build.bat run`
+## 素材引用
+贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
+字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
