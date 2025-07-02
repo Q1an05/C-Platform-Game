@@ -26,6 +26,14 @@ copy "C:\msys64\mingw64\bin\libogg-0.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libgcc_s_seh-1.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libwinpthread-1.dll" . >nul 2>&1
 
+REM SDL2_image additional dependencies
+copy "C:\msys64\mingw64\bin\libavif-16.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libjxl.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libtiff-6.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libwebp-7.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libwebpmux-3.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libwebpdemux-2.dll" . >nul 2>&1
+
 REM Additional common dependencies that might be needed
 copy "C:\msys64\mingw64\bin\libbz2-1.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libzstd.dll" . >nul 2>&1
@@ -36,6 +44,12 @@ copy "C:\msys64\mingw64\bin\libiconv-2.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libpcre2-8-0.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libharfbuzz-0.dll" . >nul 2>&1
 copy "C:\msys64\mingw64\bin\libgraphite2.dll" . >nul 2>&1
+
+REM More image format dependencies
+copy "C:\msys64\mingw64\bin\libjpeg-8.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libdeflate.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libsharpyuv-0.dll" . >nul 2>&1
+copy "C:\msys64\mingw64\bin\libLerc.dll" . >nul 2>&1
 
 echo [INFO] Checking copied files...
 set "missing_files="

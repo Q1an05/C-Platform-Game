@@ -96,10 +96,10 @@ REM 1. 进入项目目录
 cd 小学期作业
 
 REM 2. 查看依赖安装指南（首次运行）
-build.bat deps
+diagnose.bat
 
 REM 3. 编译并运行游戏
-build.bat run
+build_simple.bat run
 ```
 
 #### 跨平台（使用Makefile）
@@ -173,7 +173,7 @@ make install-deps
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 
 # 或使用项目脚本查看指南
-build.bat deps
+diagnose.bat
 ```
 
 **vcpkg方式：**
@@ -226,9 +226,8 @@ gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mi
 
 ```cmd
 REM 方式1：使用批处理脚本（推荐）
-build.bat               REM 仅编译
-build.bat run          REM 编译并运行
-build.bat help         REM 查看帮助
+build_simple.bat               REM 仅编译
+build_simple.bat run          REM 编译并运行
 
 REM 方式2：使用Makefile（在MSYS2中）
 make                   REM 编译
@@ -259,7 +258,7 @@ knight_game.exe
 ./build.sh run
 
 # Windows  
-build.bat run
+build_simple.bat run
 
 # 任意平台（Makefile）
 make run
@@ -281,18 +280,19 @@ make run
 ./build.sh -h            # 显示帮助信息
 ```
 
-#### build.bat (Windows)
+#### build_simple.bat (Windows)
 
 ```cmd
-build.bat                # 默认编译游戏
-build.bat build         # 编译游戏
-build.bat compile       # 编译游戏（同build）
-build.bat run           # 编译并运行游戏
-build.bat clean         # 清理编译文件
-build.bat deps          # 显示依赖安装指南
-build.bat install       # 显示依赖安装指南（同deps）
-build.bat help          # 显示帮助信息
-build.bat -h            # 显示帮助信息
+build_simple.bat                # 编译游戏并自动复制DLL
+build_simple.bat run           # 编译、复制DLL并运行游戏
+```
+
+#### 辅助工具脚本 (Windows)
+
+```cmd
+diagnose.bat            # 检查环境和依赖问题
+copy_dlls.bat           # 手动复制SDL2运行时库
+find_missing_dlls.bat   # 智能检测缺失的DLL文件
 ```
 
 ### ⚠️ 常见问题解决
@@ -316,7 +316,7 @@ make install-deps
 **解决方案**：
 ```cmd
 REM 方法1：查看安装指南
-build.bat deps
+diagnose.bat
 
 REM 方法2：MSYS2安装
 REM 在MSYS2 MINGW64终端运行：
@@ -524,7 +524,7 @@ gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -
 ./build.sh run
 
 # Windows  
-build.bat run
+build_simple.bat run
 
 # 跨平台
 make run
@@ -533,7 +533,7 @@ make run
 **完整Windows部署步骤：**
 1. 安装MSYS2: https://www.msys2.org/
 2. 在MSYS2终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
-3. 编译运行: `build.bat run`
+3. 编译运行: `build_simple.bat run`
 ## 素材引用
 贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
 字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
