@@ -36,39 +36,16 @@ export PATH="/mingw64/bin:$PATH"
 - `libwebp-7.dll缺失`
 - 以及其他各种lib*.dll文件
 
-**解决方案**：
+**解决方案（PATH配置方式）**：
 ```cmd
-# 方案1: 智能自动修复（最推荐）
-auto_fix_dlls.bat
+# 方案1: 自动配置PATH环境变量（推荐）
+setup_path.bat
 
-# 方案2: 复制所有可能需要的DLL
-copy_all_needed_dlls.bat
-
-# 方案3: 检测缺失的DLL（推荐先运行）
-find_missing_dlls.bat
-
-# 方案4: 使用基础自动复制脚本
-copy_dlls.bat
-
-# 方案5: 构建脚本会自动复制DLL
-build_simple.bat run
-
-# 方案4: 手动复制主要DLL文件
-copy C:\msys64\mingw64\bin\SDL2.dll .
-copy C:\msys64\mingw64\bin\SDL2_image.dll .
-copy C:\msys64\mingw64\bin\SDL2_ttf.dll .
-copy C:\msys64\mingw64\bin\SDL2_mixer.dll .
-
-# 方案5: 手动复制图像格式依赖DLL
-copy C:\msys64\mingw64\bin\libavif-16.dll .
-copy C:\msys64\mingw64\bin\libjxl.dll .
-copy C:\msys64\mingw64\bin\libtiff-6.dll .
-copy C:\msys64\mingw64\bin\libwebp-7.dll .
-
-# 方案6: 添加MSYS2的bin目录到系统PATH
+# 方案2: 手动添加MSYS2到系统PATH
 # 将 C:\msys64\mingw64\bin 永久添加到系统环境变量PATH中
+# 具体步骤见下方"PATH配置说明"
 
-# 方案7: 在MSYS2终端中运行游戏
+# 方案3: 在MSYS2终端中运行游戏
 # 打开MSYS2 MINGW64终端，cd到游戏目录，然后运行
 ./knight_game.exe
 ```
@@ -141,7 +118,7 @@ pkg-config --cflags --libs sdl2
 
 ## 🚀 Windows 快速开始
 
-### 方案一：MSYS2（推荐）
+### 方案一：MSYS2 + PATH配置（推荐）
 
 1. **安装MSYS2**
    ```
@@ -156,23 +133,17 @@ pkg-config --cflags --libs sdl2
    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
    ```
 
-3. **配置环境变量**
-   ```bash
-   # 将以下路径添加到系统PATH环境变量（重要！）
-   C:\msys64\mingw64\bin
-   C:\msys64\usr\bin
+3. **配置PATH环境变量（一键设置）**
+   ```cmd
+   # 进入项目目录
+   cd 小学期作业
    
-   # 或者在MSYS2终端中设置（临时）
-   export PATH="/mingw64/bin:/usr/bin:$PATH"
-   export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+   # 运行PATH配置脚本（推荐）
+   setup_path.bat
    ```
 
 4. **编译运行**
    ```cmd
-   # 如果遇到问题，先运行诊断
-   cd 小学期作业
-   diagnose.bat
-   
    # 推荐方式：使用构建脚本
    build_simple.bat run
    
@@ -180,7 +151,49 @@ pkg-config --cflags --libs sdl2
    make run
    ```
 
-### 方案二：vcpkg
+### PATH配置说明
+
+#### 自动配置（推荐）
+```cmd
+# 运行PATH配置脚本
+setup_path.bat
+```
+该脚本会：
+- 检查MSYS2安装和SDL2库
+- 提供多种PATH配置选项（临时/永久）
+- 验证配置是否成功
+
+#### 手动配置PATH环境变量
+1. **图形界面方式**：
+   - 右键点击"此电脑" → "属性"
+   - 点击"高级系统设置"
+   - 点击"环境变量"
+   - 在用户变量或系统变量中找到"PATH"
+   - 编辑PATH，添加：`C:\msys64\mingw64\bin`
+   - 确定保存，重新打开命令提示符
+
+2. **命令行方式**：
+   ```cmd
+   # 用户环境变量
+   setx PATH "C:\msys64\mingw64\bin;%PATH%"
+   
+   # 系统环境变量（需要管理员权限）
+   setx PATH "C:\msys64\mingw64\bin;%PATH%" /m
+   ```
+
+#### 验证PATH配置
+```cmd
+# 检查SDL2库是否在PATH中
+where SDL2.dll
+
+# 检查GCC编译器
+where gcc
+
+# 检查pkg-config
+where pkg-config
+```
+
+### 方案二：vcpkg（高级用户）
 
 1. **安装vcpkg**
    ```cmd
@@ -199,18 +212,44 @@ pkg-config --cflags --libs sdl2
    # 具体步骤见README.md
    ```
 
+---
+
+## 📋 PATH配置方式的优势
+
+✅ **节省磁盘空间**: 不需要在项目目录复制dll文件  
+✅ **便于维护**: dll文件统一在MSYS2目录，更新方便  
+✅ **减少冗余**: 多个项目可以共享同一套dll文件  
+✅ **环境统一**: 类似Linux系统的库管理方式  
+✅ **自动更新**: MSYS2包管理器更新时，所有项目自动受益  
+✅ **简化管理**: 一次配置，所有项目受益
+
+---
+
+## 🔧 故障排除
+
+### PATH配置后游戏仍无法运行
+
+1. **重新打开命令提示符**: 永久PATH设置需要重启命令提示符
+2. **验证PATH**: 运行 `where SDL2.dll` 检查库文件位置
+3. **权限问题**: 以管理员身份运行 `setup_path.bat` 设置系统PATH
+4. **MSYS2版本**: 确保使用MinGW64版本，不是MSYS2或UCRT64
+
+### 常见注意事项
+
+⚠️ **环境一致性**: 确保所有项目使用相同的PATH配置  
+⚠️ **重启生效**: 永久PATH设置需要重新打开命令提示符才能生效
+
 ## 🛠️ Windows构建工具功能
 
 ### Windows构建脚本
 ```cmd
 # 主要构建脚本
-build_simple.bat        # 编译游戏并自动复制DLL
-build_simple.bat run    # 编译、复制DLL并运行游戏
+build_simple.bat        # 编译游戏（使用PATH配置）
+build_simple.bat run    # 编译并运行游戏
 
 # 工具脚本
+setup_path.bat          # 配置PATH环境变量
 diagnose.bat            # 检查环境和依赖问题
-copy_dlls.bat           # 手动复制SDL2运行时库
-find_missing_dlls.bat   # 智能检测缺失的DLL文件
 ```
 
 ### 特性
@@ -316,7 +355,7 @@ pkg-config --cflags --libs sdl2
 - [ ] 项目路径不包含中文字符
 
 **运行时环境**：
-- [ ] SDL2运行时库已复制到游戏目录（运行copy_dlls.bat）
+- [ ] PATH环境变量已配置（运行setup_path.bat）
 - [ ] 所有资源文件存在（assets目录）
 - [ ] 防火墙允许程序运行
 
@@ -333,10 +372,11 @@ pkg-config --cflags --libs sdl2
 
 经过完整的Windows适配，本项目现在支持：
 - ✅ Windows 7/8/10/11
-- ✅ MSYS2/MinGW编译环境
+- ✅ MSYS2/MinGW编译环境 + PATH配置
 - ✅ vcpkg包管理器
 - ✅ 跨平台Makefile
 - ✅ Windows批处理脚本
 - ✅ 完整的中文文档
+- ✅ 一次配置，永久使用的PATH管理方式
 
-现在Windows用户可以与macOS/Linux用户一样，轻松编译和运行超级骑士游戏！ 
+现在Windows用户可以与macOS/Linux用户一样，使用统一的库管理方式，轻松编译和运行超级骑士游戏！ 

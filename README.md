@@ -90,13 +90,13 @@ cd 小学期作业
 ./build.sh run
 ```
 
-#### Windows
+#### Windows（PATH配置方式，推荐）
 ```cmd
 REM 1. 进入项目目录
 cd 小学期作业
 
-REM 2. 查看依赖安装指南（首次运行）
-diagnose.bat
+REM 2. 配置PATH环境变量（首次运行）
+setup_path.bat
 
 REM 3. 编译并运行游戏
 build_simple.bat run
@@ -172,8 +172,8 @@ make install-deps
 # 在MSYS2 MINGW64终端中运行
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 
-# 或使用项目脚本查看指南
-diagnose.bat
+# 配置PATH环境变量
+setup_path.bat
 ```
 
 **vcpkg方式：**
@@ -207,7 +207,7 @@ make install-deps
 ```bash
 # 方式1：使用shell脚本（推荐）
 ./build.sh              # 仅编译
-./build.sh run          # 编译并运行
+./build.sh run          # 编译并运行游戏
 ./build.sh help         # 查看帮助
 
 # 方式2：使用Makefile
@@ -290,11 +290,8 @@ build_simple.bat run           # 编译、复制DLL并运行游戏
 #### 辅助工具脚本 (Windows)
 
 ```cmd
-diagnose.bat                # 检查环境和依赖问题
-auto_fix_dlls.bat          # 智能检测和自动修复所有DLL依赖（推荐）
-copy_all_needed_dlls.bat   # 复制所有可能需要的DLL文件
-copy_dlls.bat              # 手动复制基础SDL2运行时库
-find_missing_dlls.bat      # 智能检测缺失的DLL文件
+setup_path.bat             # 配置PATH环境变量
+diagnose.bat               # 检查环境和依赖问题
 ```
 
 ### ⚠️ 常见问题解决
@@ -314,13 +311,16 @@ brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 make install-deps
 ```
 
-**Windows错误信息**：`GCC编译器未找到` 或 `SDL2未正确安装`
+**Windows错误信息**：`GCC编译器未找到` 或 `SDL2.dll缺失`
 **解决方案**：
 ```cmd
-REM 方法1：查看安装指南
+REM 方法1：配置PATH环境变量
+setup_path.bat
+
+REM 方法2：查看安装指南
 diagnose.bat
 
-REM 方法2：MSYS2安装
+REM 方法3：MSYS2安装
 REM 在MSYS2 MINGW64终端运行：
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 ```
@@ -539,3 +539,30 @@ make run
 ## 素材引用
 贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
 字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
+
+### 📋 Windows适配说明
+
+#### PATH配置方式
+
+Windows适配采用**PATH环境变量配置**的方式：
+
+**优势：**
+- ✅ 节省磁盘空间，无需复制dll文件
+- ✅ 便于维护和更新
+- ✅ 多项目可共享同一套dll文件
+- ✅ 类似Linux系统的库管理方式
+- ✅ 一次配置，永久受益
+
+**使用方法：**
+```cmd
+# 一键配置PATH环境变量
+setup_path.bat
+
+# 编译并运行
+build_simple.bat run
+```
+
+**故障排除：**
+- 如果PATH配置后游戏无法运行，重新打开命令提示符
+- 运行 `where SDL2.dll` 验证库文件位置
+- 确保MSYS2正确安装在 `C:\msys64`

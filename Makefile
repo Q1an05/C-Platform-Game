@@ -75,6 +75,8 @@ assets:
 # 运行游戏
 run: $(TARGET)
 ifeq ($(PLATFORM),windows)
+	@echo "正在检查Windows PATH配置..."
+	@where SDL2.dll >nul 2>&1 || (echo "警告: SDL2.dll未在PATH中找到，可能需要运行setup_path.bat" && echo "提示: 如果游戏无法启动，请运行 setup_path.bat 配置环境")
 	$(TARGET)
 else
 	./$(TARGET)
@@ -98,13 +100,15 @@ install-deps:
 ifeq ($(PLATFORM),windows)
 	@echo "Windows SDL2依赖安装指南："
 	@echo ""
-	@echo "推荐方式1 - MSYS2 (推荐):"
+	@echo "方式1 - MSYS2 + PATH配置 (推荐):"
 	@echo "1. 安装MSYS2: https://www.msys2.org/"
 	@echo "2. 在MSYS2 MINGW64终端运行:"
 	@echo "   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
+	@echo "3. 配置PATH环境变量:"
+	@echo "   setup_path.bat"
 	@echo ""
-	@echo "推荐方式2 - vcpkg:"
-	@echo "1. 安装vcpkg并运行: vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer"
+	@echo "方式2 - vcpkg (高级用户):"
+	@echo "   vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer"
 	@echo ""
 else ifeq ($(PLATFORM),macos)
 	@echo "安装SDL2依赖..."

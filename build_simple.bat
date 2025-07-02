@@ -55,13 +55,20 @@ gcc -std=c99 -Wall -o knight_game.exe scripts\main.c scripts\knight.c scripts\ma
 if %errorlevel% equ 0 (
     echo [SUCCESS] Compilation successful!
     
-    echo [INFO] Copying SDL2 runtime libraries...
-    call copy_all_needed_dlls.bat
+    echo [INFO] Configuring PATH for SDL2 libraries...
+    echo [INFO] Using PATH configuration instead of copying DLLs
+    
+    REM 确保当前会话PATH包含MSYS2
+    set "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
     
     echo [INFO] Game ready! You can run: knight_game.exe
+    echo [NOTE] SDL2 libraries will be loaded from MSYS2 PATH
+    
     if "%1"=="run" (
         echo [INFO] Starting game...
         knight_game.exe
+    ) else (
+        echo [TIP] If game fails to start, run: setup_path.bat
     )
 ) else (
     echo [ERROR] Compilation failed!
