@@ -1,7 +1,10 @@
-# 超级骑士第一关
-用C语言和SDL2实现的平台跳跃游戏第一关
+# 超级骑士游戏
 
-### 基础功能
+基于C语言和SDL2开发的2D平台跳跃游戏，实现了完整的物理系统、动画渲染、音效系统和敌人AI。
+
+## 游戏特性
+
+### 核心功能
 - 角色移动（左右键）和跳跃（空格键）
 - 重力物理系统和碰撞检测
 - 卷轴式摄像机跟随
@@ -9,9 +12,35 @@
 - 敌人系统
 - UI系统（支持中英文切换）
 - 道具（技能）系统
-- 地图编辑（基于方块系统）
 
-#### 地图编辑字符说明：
+### 视觉系统
+- **混合渲染模式**：地图使用PNG纹理，角色使用动画纹理，其他元素使用彩色矩形
+- **智能纹理选择**：系统自动根据方块位置选择草地或泥土纹理
+- **动画播放系统**：角色动画以固定0.1秒/帧的速度播放
+- **平滑渲染**：优化浮点数计算，消除移动卡顿
+- **无敌闪烁**：受伤时角色会闪烁显示
+
+### 游戏元素
+- 草地方块：使用grass.png纹理（16x16像素）
+- 泥土方块：使用mud.png纹理（16x16像素）
+- 角色：使用动画纹理系统（15x20像素）
+  - 静止：4帧idle动画循环播放
+  - 移动：16帧run动画流畅播放
+  - 自动水平翻转，真实方向感
+- 敌人：16x16像素动画
+- 天蓝色背景
+
+## 操作说明
+
+- **左/右方向键**：移动
+- **空格键**：跳跃
+- **D键**：冲刺（获得技能后）
+- **ESC键**：退出游戏
+
+## 地图编辑
+
+使用字符在map.c的二维数组中定义地图：
+
 ```
 'G' = 草地（地表，使用grass.png）
 'M' = 泥土（地下，使用mud.png）
@@ -21,64 +50,35 @@
 'D' = 冲刺技能方块
 'E' = 敌人位置（游戏启动时自动转换为敌人）
 'B' = 敌人的不可见障碍，用于设定敌人活动范围
-'C' = 摄像机移动不可见方块，角色触碰时会将摄像机镜头右移，展示右方地图
+'C' = 摄像机移动不可见方块，角色触碰时会将摄像机镜头右移
 'S' = 平台跳跃前的存档点，角色掉下去会回到存档点
 'T' = 陷阱方块，不可见，角色触碰会回到存档点
 't' = 通关方块（绿色终点，触碰即通关）
 ```
-使用方法：在map.c的二维字符数组地图中添加对应字符即可
 
-### 视觉系统 ✨
-- **混合渲染模式**：地图使用PNG纹理，角色使用动画纹理，其他元素使用彩色矩形
-  - 🌱 草地方块：使用grass.png纹理（16x16像素）
-  - 🟫 泥土方块：使用mud.png纹理（16x16像素）
-  - 🏃 角色：使用动画纹理系统（15x20像素）
-    - 静止：4帧idle动画循环播放
-    - 移动：16帧run动画流畅播放
-    - 自动水平翻转，真实方向感
-  - 敌人：（16x16）
-  - 天蓝色：背景
-- **智能纹理选择**：系统自动根据方块位置选择草地或泥土纹理
-- **动画播放系统**：角色动画以固定0.1秒/帧的速度播放，平滑流畅
-- **平滑渲染**：优化浮点数计算，消除移动卡顿和闪回
-- **无敌闪烁**：受伤时角色会闪烁显示
-- **高性能混合渲染**：关键地形和角色使用纹理，UI元素使用几何绘制
+## 系统要求
 
-### 操作方式
-- **左/右方向键**：移动
-- **空格键**：跳跃
-- **D键**：冲刺（获得技能后）
-- **ESC键**：退出游戏
-
-### 游戏目标
-- 避开或踩踏敌人
-- 撞击奖励方块
-- 尽可能向右前进
-
-## 📋 完整编译运行教程
-
-### 🔧 系统要求
 - **操作系统**: macOS / Windows / Linux（跨平台支持）
 - **编译器**: GCC (推荐) 或 Clang
 - **依赖库**: SDL2, SDL2_image, SDL2_ttf, SDL2_mixer
 
-#### 各平台要求详情
+### 各平台具体要求
+
 **macOS**:
-- **包管理器**: Homebrew
-- **编译器**: GCC（系统自带或Xcode Command Line Tools）
+- 包管理器: Homebrew
+- 编译器: GCC（系统自带或Xcode Command Line Tools）
 
 **Windows**:
-- **推荐环境**: MSYS2 + MinGW-w64
-- **替代方案**: vcpkg + Visual Studio, Dev-C++等
-- **编译器**: GCC (MinGW) 或 MSVC
+- 推荐环境: MSYS2 + MinGW-w64
+- 编译器: GCC (MinGW) 或 MSVC
 
 **Linux**:
-- **包管理器**: apt, dnf, pacman等
-- **编译器**: GCC（系统自带）
+- 包管理器: apt, dnf, pacman等
+- 编译器: GCC（系统自带）
 
-### 🚀 快速开始（推荐流程）
+## 快速开始
 
-#### macOS / Linux
+### macOS / Linux
 ```bash
 # 1. 进入项目目录
 cd 小学期作业
@@ -90,24 +90,22 @@ cd 小学期作业
 ./build.sh run
 ```
 
-#### Windows
+### Windows
 ```cmd
-# Windows用户请使用 `make` 命令
 # 1. 安装MSYS2和相关依赖
 # 2. 在MSYS2 MINGW64终端运行
 make run
 ```
 
-#### 跨平台（使用Makefile）
+### 跨平台（使用Makefile）
 ```bash
-# 任意平台
 make install-deps    # 查看依赖安装指南
 make run            # 编译并运行
 ```
 
-### 📥 详细安装步骤
+## 详细安装步骤
 
-#### 步骤1：环境准备
+### 步骤1：环境准备
 
 **macOS用户：**
 ```bash
@@ -119,15 +117,11 @@ brew --version
 ```
 
 **Windows用户：**
-
-**MSYS2（推荐）：**
-```
 1. 下载并安装MSYS2: https://www.msys2.org/
 2. 打开MSYS2 MINGW64终端
-3. 更新包数据库: pacman -Syu
-4. 重启终端，再次更新: pacman -Su
-5. 将 C:\msys64\mingw64\bin 添加到系统PATH环境变量
-```
+3. 更新包数据库: `pacman -Syu`
+4. 重启终端，再次更新: `pacman -Su`
+5. 将 `C:\msys64\mingw64\bin` 添加到系统PATH环境变量
 
 **Linux用户：**
 ```bash
@@ -141,7 +135,7 @@ sudo dnf update  # 或 sudo yum update
 sudo pacman -Syu
 ```
 
-#### 步骤2：安装依赖库
+### 步骤2：安装依赖库
 
 **macOS：**
 ```bash
@@ -155,14 +149,10 @@ brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 make install-deps
 ```
 
-**Windows：**
-
-**MSYS2方式（推荐）：**
+**Windows（MSYS2）：**
 ```bash
 # 在MSYS2 MINGW64终端中运行
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
-# 如果只缺make，也可以单独安装：
-pacman -S mingw-w64-x86_64-make
 ```
 
 **Linux：**
@@ -175,25 +165,19 @@ sudo dnf install make pkgconf SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mi
 
 # Arch Linux
 sudo pacman -S make sdl2 sdl2_image sdl2_ttf sdl2_mixer
-
-# 如果只缺make，也可以单独安装：
-sudo apt-get install make
 ```
 
-#### 步骤3：编译游戏
+### 步骤3：编译游戏
 
 **macOS / Linux：**
-
 ```bash
 # 方式1：使用shell脚本（推荐）
 ./build.sh              # 仅编译
 ./build.sh run          # 编译并运行游戏
-./build.sh help         # 查看帮助
 
 # 方式2：使用Makefile
 make                    # 编译
 make run               # 编译并运行
-make help              # 查看帮助
 
 # 方式3：手动编译（macOS）
 gcc -std=c99 -Wall $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o knight_game scripts/*.c
@@ -203,17 +187,16 @@ gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mi
 ```
 
 **Windows：**
-
 ```cmd
 # 推荐在MSYS2 MINGW64终端中使用make
-make                   REM 编译
-make run              REM 编译并运行
+make                   # 编译
+make run              # 编译并运行
 
 # 或者手动编译
 gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game.exe scripts/*.c
 ```
 
-#### 步骤4：运行游戏
+### 步骤4：运行游戏
 
 **macOS / Linux：**
 ```bash
@@ -224,97 +207,76 @@ gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mi
 ```cmd
 # 在MSYS2 MINGW64终端中运行
 ./knight_game.exe
-
-# 或者在普通命令提示符中运行（需已配置PATH）
-knight_game.exe
 ```
 
-**跨平台（使用构建脚本）：**
-```bash
-# macOS/Linux
-./build.sh run
+## 构建脚本功能
 
-# 任意平台（Makefile）
-make run
-```
-
-### 🛠️ 构建脚本完整功能
-
-#### build.sh (macOS/Linux)
+### build.sh (macOS/Linux)
 
 ```bash
 ./build.sh                # 默认编译游戏
 ./build.sh build         # 编译游戏
-./build.sh compile       # 编译游戏（同build）
 ./build.sh run           # 编译并运行游戏
 ./build.sh clean         # 清理编译文件
 ./build.sh deps          # 安装依赖库
-./build.sh install       # 安装依赖库（同deps）
 ./build.sh help          # 显示帮助信息
-./build.sh -h            # 显示帮助信息
 ```
 
-### ⚠️ 常见问题解决
+### Makefile (跨平台)
 
-#### 问题1：SDL2依赖库未找到
+```bash
+make                     # 编译游戏
+make run                # 编译并运行游戏
+make clean              # 清理编译文件
+make install-deps       # 显示依赖安装指南
+make help               # 显示帮助信息
+```
 
-**macOS错误信息**：`SDL2未安装` 或 `command not found: sdl2-config`
+## 常见问题解决
+
+### 问题1：SDL2依赖库未找到
+
+**macOS错误**：`SDL2未安装` 或 `command not found: sdl2-config`
 **解决方案**：
 ```bash
-# 方法1：使用脚本安装
 ./build.sh deps
-
-# 方法2：手动安装
+# 或
 brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
-
-# 方法3：使用Makefile
-make install-deps
 ```
 
-**Windows错误信息**：`GCC编译器未找到` 或 `SDL2.dll缺失` 或 `libwinpthread-1.dll缺失`
+**Windows错误**：`GCC编译器未找到` 或 `SDL2.dll缺失`
 **解决方案**：
-```cmd
-# 1. 确保已安装MSYS2
-# 2. 确保已将 C:\msys64\mingw64\bin 添加到系统PATH
-# 3. 重新打开MSYS2 MINGW64终端
-# 4. 在MSYS2 MINGW64终端运行依赖安装命令
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
-```
+1. 确保已安装MSYS2
+2. 确保已将 `C:\msys64\mingw64\bin` 添加到系统PATH
+3. 重新打开MSYS2 MINGW64终端
+4. 安装依赖包
 
-**Linux错误信息**：`pkg-config: command not found` 或依赖库未找到
+**Linux错误**：`pkg-config: command not found` 或依赖库未找到
 **解决方案**：
 ```bash
 # Ubuntu/Debian
 sudo apt-get install pkg-config libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
 
-# Fedora
-sudo dnf install pkgconf SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
-
 # 给build.sh执行权限
 chmod +x build.sh
 ```
 
-#### 问题3：包管理器未安装
+### 问题2：包管理器未安装
 
-**macOS错误信息**：`command not found: brew`
+**macOS**：`command not found: brew`
 **解决方案**：
 ```bash
-# 安装Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-**Windows错误信息**：`MSYS2未安装` 或 `pacman: command not found`
+**Windows**：`MSYS2未安装` 或 `pacman: command not found`
 **解决方案**：
-```
 1. 下载并安装MSYS2: https://www.msys2.org/
 2. 将MSYS2的mingw64/bin目录添加到系统PATH环境变量
 3. 重启命令提示符或MSYS2终端
-```
 
-#### 问题4：音频文件缺失
-**错误信息**：无法加载音效文件
+### 问题3：音频文件缺失
 
-**解决方案**：
 确保`assets/sounds/`目录包含所有音频文件：
 - `jump.wav` - 跳跃音效
 - `hurt.wav` - 受伤音效
@@ -324,10 +286,8 @@ chmod +x build.sh
 - `tap.wav` - 菜单切换音效
 - `music.mp3` - 背景音乐
 
-#### 问题5：图片素材缺失
-**错误信息**：纹理加载失败
+### 问题4：图片素材缺失
 
-**解决方案**：
 确保`assets/sprites/`目录包含所有图片文件：
 ```
 assets/sprites/
@@ -337,77 +297,28 @@ assets/sprites/
 └── world/           # 地形纹理
 ```
 
-#### 问题6：Windows路径问题
-**错误信息**：路径不存在或文件找不到
+## 性能和特性
 
-**解决方案**：
-```cmd
-REM 确保在项目根目录下运行
-cd /d "项目路径"
-
-REM 使用反斜杠作为路径分隔符
-REM 避免路径中包含中文或特殊字符
-```
-
-#### 问题7：中文路径问题
-**现象**：路径包含中文字符导致编译失败
-
-**解决方案**：
-```
-1. 将项目移动到纯英文路径下（推荐）
-2. 或在MSYS2中使用UTF-8编码：
-   export LANG=zh_CN.UTF-8
-```
-
-#### 问题8：Visual Studio编译问题
-**错误信息**：找不到SDL2库文件
-
-**解决方案**：
-```cmd
-REM 确保vcpkg正确安装SDL2
-.\vcpkg\vcpkg list
-
-REM 设置vcpkg工具链
-cmake -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake
-
-REM 或使用预编译库并设置环境变量
-set SDL2_DIR=path\to\SDL2
-```
-
-#### 问题9：编译时出现警告
-**现象**：编译成功但有warning信息
-
-**解决方案**：
-警告信息通常不影响运行，如需消除可以：
-```bash
-# macOS/Linux：使用更宽松的编译选项
-gcc -std=c99 $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o knight_game scripts/*.c
-
-# Windows：使用更宽松的编译选项
-gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game.exe scripts/*.c
-```
-
-### 性能和特性
-
-#### 编译输出
+### 编译输出
 - **可执行文件大小**：约60KB
 - **编译时间**：通常1-3秒
 - **运行内存占用**：约10-20MB
 
-#### 游戏性能
+### 游戏性能
 - **帧率**：60 FPS
 - **分辨率**：320x176 (16:9比例)
 - **格子大小**：16x16像素
 - **视野范围**：20x11格子
 
-#### 技术特性
--  **完整音效系统**：7种音效 + 背景音乐循环播放
--  **动画系统**：角色多状态动画，支持水平翻转
--  **智能地图系统**：支持重置，数据驱动的敌人生成
--  **UI系统**：游戏提示、菜单系统、多语言支持
--  **输入系统**：响应式按键处理，支持连发和单次触发
+### 技术特性
+- **完整音效系统**：7种音效 + 背景音乐循环播放
+- **动画系统**：角色多状态动画，支持水平翻转
+- **智能地图系统**：支持重置，数据驱动的敌人生成
+- **UI系统**：游戏提示、菜单系统、多语言支持
+- **输入系统**：响应式按键处理，支持连发和单次触发
 
-## 📁 项目结构详解
+## 项目结构
+
 ```
 小学期作业/
 ├── scripts/               # 所有源代码文件
@@ -423,19 +334,14 @@ gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -
 │   └── sound.c/h          # 音效系统和音频管理
 ├── assets/                # 游戏资源文件
 │   ├── fonts/            # 字体文件
-│   ├── sounds/           # 音频文件（音效+背景音乐）
+│   ├── sounds/           # 音频文件
 │   └── sprites/          # 图片素材
-│       ├── player/       # 角色动画帧
-│       ├── enemy/        # 敌人动画帧
-│       ├── rewards/      # 奖励道具图片
-│       └── world/        # 地形纹理
 ├── build.sh              # 智能编译脚本
 ├── Makefile              # Make配置文件
-├── knight_game           # 编译后的可执行文件
 └── README.md             # 项目说明文档
 ```
 
-## 🚀 技术特点
+## 技术特点
 
 ### 核心技术栈
 - **编程语言**：标准C语言（C99）
@@ -455,38 +361,37 @@ gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -
 - **内存管理**：及时释放资源，避免内存泄漏
 - **帧率控制**：固定60FPS，保证游戏流畅运行
 
-##  开发学习收获
--  掌握了SDL2图形编程基础和高级特性
--  实现了完整的2D游戏物理系统
--  学会了模块化程序设计和大型项目组织
--  理解了游戏循环、状态管理和事件处理
--  实践了碰撞检测、动画系统和音效管理
--  体验了从功能实现到性能优化的完整开发流程
--  学会了构建系统设计和跨平台兼容性处理
--  掌握了资源管理、内存优化和错误处理
--  理解了游戏开发中的数学计算和算法应用
+## 开发学习收获
+
+- 掌握了SDL2图形编程基础和高级特性
+- 实现了完整的2D游戏物理系统
+- 学会了模块化程序设计和大型项目组织
+- 理解了游戏循环、状态管理和事件处理
+- 实践了碰撞检测、动画系统和音效管理
+- 体验了从功能实现到性能优化的完整开发流程
+- 学会了构建系统设计和跨平台兼容性处理
+- 掌握了资源管理、内存优化和错误处理
+- 理解了游戏开发中的数学计算和算法应用
+
+## 素材引用
+
+- 贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
+- 字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
 
 ---
 
-**现在就开始体验超级骑士的冒险之旅吧！** 
-
 **快速开始命令：**
+
 ```bash
 # macOS/Linux
 ./build.sh run
 
 # Windows (在MSYS2 MINGW64终端中)
 make run
-
-# 跨平台
-make run
 ```
 
 **完整Windows部署步骤：**
 1. 安装MSYS2: https://www.msys2.org/
-2. 将 C:\msys64\mingw64\bin 添加到系统PATH环境变量
+2. 将 `C:\msys64\mingw64\bin` 添加到系统PATH环境变量
 3. 在MSYS2 MINGW64终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
 4. 编译运行: `make run`
-## 素材引用
-贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
-字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
