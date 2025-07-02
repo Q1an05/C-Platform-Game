@@ -15,4 +15,8 @@
 # 可执行文件（如knight）
 knight
 mario_game
-knight_game 
+knight_game
+
+# IDE配置文件夹
+.vscode/
+.cursor/ 
