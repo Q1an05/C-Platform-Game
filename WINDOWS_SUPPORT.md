@@ -27,14 +27,17 @@ export PATH="/mingw64/bin:$PATH"
 ### ❌ `build.bat出现乱码或命令不识别`
 **解决方案**：
 ```cmd
-# 方案1: 使用简化版脚本（推荐）
+# 方案1: 先运行诊断脚本检查问题
+diagnose.bat
+
+# 方案2: 使用简化版脚本（推荐）
 build_simple.bat
 
-# 方案2: 在MSYS2终端中运行
+# 方案3: 在MSYS2终端中运行
 # 打开MSYS2 MINGW64终端，然后运行
 ./build.bat
 
-# 方案3: 直接使用make命令
+# 方案4: 直接使用make命令
 make
 ```
 
@@ -109,12 +112,14 @@ pkg-config --cflags --libs sdl2
 
 4. **编译运行**
    ```cmd
-   # 方案1: 使用简化脚本（推荐，解决编码问题）
+   # 如果遇到问题，先运行诊断
    cd 小学期作业
+   diagnose.bat
+   
+   # 方案1: 使用简化脚本（推荐，解决编码问题）
    build_simple.bat run
    
    # 方案2: 在MSYS2 MINGW64终端中运行
-   cd 小学期作业
    build.bat run
    
    # 方案3: 直接使用make命令
@@ -155,6 +160,9 @@ build.bat help          # 显示帮助信息
 # 简化版本（解决编码问题）
 build_simple.bat        # 编译游戏
 build_simple.bat run    # 编译并运行游戏
+
+# 诊断工具
+diagnose.bat            # 检查环境和依赖问题
 ```
 
 ### 特性

@@ -41,10 +41,16 @@ if %errorlevel% neq 0 (
 )
 
 echo [INFO] All dependencies found
+echo [INFO] Getting SDL2 compile flags...
+
+REM Get SDL2 flags using pkg-config
+for /f "delims=" %%i in ('pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer') do set "SDL_FLAGS=%%i"
+
+echo [INFO] SDL2 flags: %SDL_FLAGS%
 echo [INFO] Starting compilation...
 
-REM Compile
-gcc -std=c99 -Wall -o knight_game.exe scripts\main.c scripts\knight.c scripts\map.c scripts\render.c scripts\input.c scripts\camera.c scripts\blocks.c scripts\enemy.c scripts\ui.c scripts\sound.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
+REM Compile using pkg-config flags
+gcc -std=c99 -Wall -o knight_game.exe scripts\main.c scripts\knight.c scripts\map.c scripts\render.c scripts\input.c scripts\camera.c scripts\blocks.c scripts\enemy.c scripts\ui.c scripts\sound.c %SDL_FLAGS%
 
 if %errorlevel% equ 0 (
     echo [SUCCESS] Compilation successful!

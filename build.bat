@@ -47,10 +47,15 @@ if exist "C:\msys64\mingw64\bin\gcc.exe" (
     call :print_info "MSYS2 found, adding to PATH..."
     set "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
     set "PKG_CONFIG_PATH=C:\msys64\mingw64\lib\pkgconfig;C:\msys64\mingw64\share\pkgconfig"
+    call :print_info "PATH updated: %PATH%"
+    call :print_info "PKG_CONFIG_PATH set: %PKG_CONFIG_PATH%"
 ) else (
     call :print_error "MSYS2 not found in C:\msys64\"
     call :print_info "Please install MSYS2 from https://www.msys2.org/"
     call :print_info "Or run this script from MSYS2 MINGW64 terminal"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 goto :check_dependencies
@@ -64,6 +69,9 @@ where gcc >nul 2>&1
 if %errorlevel% neq 0 (
     call :print_error "GCC compiler not found"
     call :print_info "Solution: pacman -S mingw-w64-x86_64-gcc"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -80,6 +88,9 @@ where pkg-config >nul 2>&1
 if %errorlevel% neq 0 (
     call :print_error "pkg-config tool not found"
     call :print_info "Solution: pacman -S mingw-w64-x86_64-pkg-config"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -87,9 +98,13 @@ REM Check SDL2 libraries
 pkg-config --exists sdl2 >nul 2>&1
 if %errorlevel% neq 0 (
     call :print_error "SDL2 not found or PKG_CONFIG_PATH not set"
+    call :print_info "Current PKG_CONFIG_PATH: %PKG_CONFIG_PATH%"
     call :print_info "Solutions:"
     call :print_info "1. pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
     call :print_info "2. Set PKG_CONFIG_PATH environment variable"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
