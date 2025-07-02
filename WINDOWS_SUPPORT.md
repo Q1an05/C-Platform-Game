@@ -24,6 +24,18 @@ pacman -S mingw-w64-x86_64-gcc
 export PATH="/mingw64/bin:$PATH"
 ```
 
+### ❌ `main函数参数不匹配`
+**错误信息**: `number of arguments doesn't match prototype`
+**解决方案**：
+```c
+// 错误的写法
+int main() {
+
+// 正确的写法（SDL2在Windows上要求标准参数）
+int main(int argc, char* argv[]) {
+```
+**说明**: SDL2在Windows上会重定义main为SDL_main，必须使用标准的argc/argv参数。
+
 ### ❌ `build.bat出现乱码或命令不识别`
 **解决方案**：
 ```cmd
@@ -261,6 +273,7 @@ pkg-config --cflags --libs sdl2
 - [ ] 已安装SDL2相关库
 - [ ] PATH环境变量包含：C:\msys64\mingw64\bin
 - [ ] PKG_CONFIG_PATH环境变量已设置
+- [ ] main函数使用正确签名：`int main(int argc, char* argv[])`
 - [ ] 项目路径不包含中文字符
 - [ ] 所有资源文件存在（assets目录）
 - [ ] 防火墙允许程序运行

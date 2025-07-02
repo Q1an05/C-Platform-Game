@@ -45,7 +45,7 @@ void reset_game() {
     reset_menu_selection();
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     // 初始化各个模块
     if (!init_render()) {
         printf("SDL2 初始化失败！\n");
