@@ -15,7 +15,7 @@ static SDL_Keycode key_mapping[INPUT_COUNT] = {
     [INPUT_RIGHT] = SDLK_RIGHT,    // 右方向键
     [INPUT_JUMP]  = SDLK_SPACE,    // 空格键
     [INPUT_PAUSE] = SDLK_p,        // P键暂停
-    [INPUT_QUIT]  = SDLK_ESCAPE,   // ESC键退出
+    [INPUT_QUIT]  = SDLK_q,        // Q键退出（改为Q键，避免和ESC冲突）
     [INPUT_DASH]  = SDLK_d         // D键冲刺
 };
 

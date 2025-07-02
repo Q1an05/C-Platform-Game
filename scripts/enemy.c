@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "map.h"
 #include "knight.h"
+#include "sound.h"
 #include <stdio.h>
 #include <math.h>
 #include "blocks.h" // 确保包含blocks.h
@@ -283,6 +284,9 @@ void stomp_enemy(int enemy_index) {
         
         enemy->state = ENEMY_STATE_STOMPED;
         enemy->death_timer = 0;
+        
+        // 播放击杀敌人音效
+        play_sound(SOUND_EXPLOSION);
         
         // 可以在这里添加得分逻辑
         printf("踩死了一个敌人！\n");

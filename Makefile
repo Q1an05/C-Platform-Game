@@ -3,11 +3,11 @@
 # 编译器设置
 CC = gcc
 CFLAGS = -std=c99 -Wall
-LDFLAGS = $(shell sdl2-config --cflags --libs) -lSDL2_image
+LDFLAGS = $(shell sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 # 源文件（在scripts文件夹中）
-SOURCES = scripts/main.c scripts/knight.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c
-HEADERS = scripts/knight.h scripts/map.h scripts/render.h scripts/input.h scripts/camera.h scripts/blocks.h scripts/enemy.h
+SOURCES = scripts/main.c scripts/knight.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c scripts/ui.c scripts/sound.c
+HEADERS = scripts/knight.h scripts/map.h scripts/render.h scripts/input.h scripts/camera.h scripts/blocks.h scripts/enemy.h scripts/ui.h scripts/sound.h
 
 # 目标文件
 TARGET = knight_game
@@ -40,7 +40,7 @@ clean:
 # 安装依赖（macOS）
 install-deps:
 	@echo "安装SDL2依赖..."
-	brew install sdl2 sdl2_image
+	brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 
 # 显示帮助
 help:

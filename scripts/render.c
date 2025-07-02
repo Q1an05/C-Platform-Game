@@ -10,6 +10,7 @@
 #include "blocks.h"
 #include "enemy.h"
 #include "render.h"
+#include "ui.h"
 
 // 全局窗口和渲染器指针
 SDL_Window* gWindow = NULL;
@@ -245,6 +246,21 @@ void render_game() {
     // 清屏（天空蓝）
     SDL_SetRenderDrawColor(gRenderer, COLOR_BG.r, COLOR_BG.g, COLOR_BG.b, COLOR_BG.a);
     SDL_RenderClear(gRenderer);
+    
+    // 根据游戏状态渲染不同内容
+    GameState current_state = get_game_state();
+    
+    if (current_state == GAME_STATE_MAIN_MENU) {
+        // 渲染主菜单
+        render_main_menu();
+        SDL_RenderPresent(gRenderer);
+        return;
+    } else if (current_state == GAME_STATE_GAME_OVER) {
+        // 渲染游戏结束画面
+        render_game_over_screen();
+        SDL_RenderPresent(gRenderer);
+        return;
+    }
 
     // 获取摄像机浮点数位置
     float camera_x_float, camera_y_float;
@@ -401,6 +417,17 @@ void render_game() {
             // 备用：如果纹理加载失败，使用纯色矩形
             draw_colored_rect(gRenderer, knightRect.x, knightRect.y, knightRect.w, knightRect.h, COLOR_KNIGHT);
         }
+    }
+
+    // 渲染游戏内UI（生命值、提示等）
+    render_game_ui();
+    
+    // 渲染游戏提示（操作提示、技能获得提示等）
+    render_game_hints();
+    
+    // 如果游戏暂停，渲染暂停菜单
+    if (current_state == GAME_STATE_PAUSED) {
+        render_pause_menu();
     }
 
     SDL_RenderPresent(gRenderer);

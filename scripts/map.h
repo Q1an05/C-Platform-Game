@@ -10,4 +10,7 @@
 // 地图数组声明（每行+1用于字符串结尾）
 extern char game_map[MAP_HEIGHT][MAP_WIDTH+1];
 
+// 地图管理函数
+void reset_map();  // 重置地图到初始状态
+
 #endif // MAP_H 

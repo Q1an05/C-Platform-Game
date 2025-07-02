@@ -4,6 +4,8 @@
 #include "knight.h"
 #include "map.h"
 #include "blocks.h"
+#include "ui.h"
+#include "sound.h"
 #include <stdio.h>
 #include <math.h>
 #include "camera.h"
@@ -17,6 +19,7 @@ extern int game_over;
 static float save_x = 2 * TILE_SIZE;
 static float save_y = 6 * TILE_SIZE;
 static int save_set = 0; // 是否已存档
+static int game_won = 0; // 是否已通关（防止重复触发）
 
 // 初始化骑士
 void init_knight() {
@@ -48,6 +51,9 @@ void init_knight() {
     knight.is_dashing = 0;
     knight.dash_timer = 0.0f;
     knight.dash_cooldown = 0.0f;
+    
+    // 重置游戏标志
+    game_won = 0;
 }
 
 // 检查指定位置是否有碰撞（撞墙或超出边界）
@@ -283,11 +289,14 @@ void update_knight() {
         }
     }
 
-    // 检查是否到达通关方块
+    // 检查是否到达通关方块（只触发一次）
     int knight_grid_x = (int)((knight.x + knight.width / 2) / TILE_SIZE);
     int knight_grid_y = (int)((knight.y + knight.height / 2) / TILE_SIZE);
-    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_GOAL) {
-        game_over = 1;
+    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_GOAL && !game_won) {
+        // 设置游戏状态为通关，显示通关菜单
+        game_won = 1;
+        set_game_state(GAME_STATE_GAME_OVER);
+        play_sound(SOUND_COIN); // 播放通关音效
         printf("恭喜通关！你成功到达终点！\n");
     }
 
@@ -295,7 +304,8 @@ void update_knight() {
     if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_DOUBLE_JUMP) {
         if (collect_double_jump_block(knight_grid_x, knight_grid_y)) {
             knight_enable_double_jump();
-            printf("获得二连跳能力！\n");
+            show_skill_hint("double_jump");
+            play_sound(SOUND_POWER_UP); // 播放技能获得音效
         }
     }
 
@@ -303,7 +313,8 @@ void update_knight() {
     if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_DASH) {
         if (collect_dash_block(knight_grid_x, knight_grid_y)) {
             knight_enable_dash();
-            printf("获得冲刺能力！\n");
+            show_skill_hint("dash");
+            play_sound(SOUND_POWER_UP); // 播放技能获得音效
         }
     }
 
@@ -360,9 +371,11 @@ void knight_jump() {
         knight.vy = JUMP_FORCE;
         knight.on_ground = 0;
         knight.double_jump_used = 0;
+        play_sound(SOUND_JUMP); // 播放跳跃音效
     } else if (knight.can_double_jump && !knight.double_jump_used && knight.alive) {
         knight.vy = JUMP_FORCE;
         knight.double_jump_used = 1;
+        play_sound(SOUND_JUMP); // 播放跳跃音效
     }
 }
 
@@ -388,6 +401,7 @@ void knight_take_damage() {
     if (!knight.alive || knight.hurt_timer > 0 || knight.is_taking_damage || knight.is_dying) return;
     knight.lives--;
     printf("骑士受伤！剩余生命：%d\n", knight.lives);
+    play_sound(SOUND_HURT); // 播放受伤音效
 
     if (knight.lives <= 0) {
         knight.is_dying = 1;
