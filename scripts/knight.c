@@ -18,7 +18,8 @@ extern int game_over;
 // 存档点坐标
 static float save_x = 2 * TILE_SIZE;
 static float save_y = 6 * TILE_SIZE;
-static int save_set = 0; // 是否已存档
+static int save_set = 0; // 是否已存档（保留用于初始化检查）
+static int on_save_block = 0; // 当前是否在存档点上（用于避免重复触发）
 static int game_won = 0; // 是否已通关（防止重复触发）
 
 // 初始化骑士
@@ -52,8 +53,9 @@ void init_knight() {
     knight.dash_timer = 0.0f;
     knight.dash_cooldown = 0.0f;
     
-    // 重置游戏标志
+    // 重置游戏标志和存档状态
     game_won = 0;
+    on_save_block = 0; // 重置存档点状态
 }
 
 // 检查指定位置是否有碰撞（撞墙或超出边界）
@@ -335,12 +337,15 @@ void update_knight() {
     }
 
     // 检查是否到达存档点方块
-    if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_SAVE && !save_set) {
+    int current_on_save = (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_SAVE);
+    if (current_on_save && !on_save_block) {
+        // 刚刚进入存档点，进行保存
         save_x = knight.x;
         save_y = knight.y;
         save_set = 1;
         printf("存档点已记录：(%f, %f)\n", save_x, save_y);
     }
+    on_save_block = current_on_save; // 更新存档点状态
     // 检查是否到达陷阱方块
     if (get_block_type(knight_grid_x, knight_grid_y) == BLOCK_TRAP) {
         if (knight.lives > 1) {

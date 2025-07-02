@@ -191,7 +191,9 @@ int main() {
             // 最后更新摄像机（在所有逻辑更新完成后）
             float knight_x, knight_y;
             get_knight_position(&knight_x, &knight_y);
-            update_camera(knight_x, knight_y);
+            
+            // 使用优化的摄像机更新函数，传递角色状态信息
+            update_camera_with_state(knight_x, knight_y, knight.vx, knight.is_dashing, knight.facing_right);
         }
         
         // 更新UI效果（在所有游戏状态下都更新）

@@ -65,6 +65,7 @@ static const TextEntry text_table[] = {
     {"start_hint", "方向键左右移动，空格键跳跃", "Arrow keys to move, Space to jump"},
     {"double_jump_hint", "已获得二连跳技能", "Double Jump skill acquired"},
     {"dash_hint", "已获得冲刺技能，按D键冲刺", "Dash skill acquired, press D to dash"},
+    {"save_hint", "游戏进度已保存！", "Game progress saved!"},
     
     // 语言切换
     {"lang_switched_cn", "切换为中文", "Switched to Chinese"},
@@ -396,6 +397,8 @@ void show_skill_hint(const char* skill_name) {
         strncpy(skill_hint_text, get_text("double_jump_hint"), sizeof(skill_hint_text) - 1);
     } else if (strcmp(skill_name, "dash") == 0) {
         strncpy(skill_hint_text, get_text("dash_hint"), sizeof(skill_hint_text) - 1);
+    } else if (strcmp(skill_name, "save") == 0) {
+        strncpy(skill_hint_text, get_text("save_hint"), sizeof(skill_hint_text) - 1);
     } else {
         strncpy(skill_hint_text, skill_name, sizeof(skill_hint_text) - 1);
     }
