@@ -90,16 +90,12 @@ cd 小学期作业
 ./build.sh run
 ```
 
-#### Windows（PATH配置方式，推荐）
+#### Windows
 ```cmd
-REM 1. 进入项目目录
-cd 小学期作业
-
-REM 2. 配置PATH环境变量（首次运行）
-setup_path.bat
-
-REM 3. 编译并运行游戏
-build_simple.bat run
+# Windows用户请使用 `make` 命令
+# 1. 安装MSYS2和相关依赖
+# 2. 在MSYS2 MINGW64终端运行
+make run
 ```
 
 #### 跨平台（使用Makefile）
@@ -124,19 +120,13 @@ brew --version
 
 **Windows用户：**
 
-**方案1 - MSYS2（推荐）：**
+**MSYS2（推荐）：**
 ```
 1. 下载并安装MSYS2: https://www.msys2.org/
 2. 打开MSYS2 MINGW64终端
 3. 更新包数据库: pacman -Syu
 4. 重启终端，再次更新: pacman -Su
-```
-
-**方案2 - vcpkg：**
-```
-1. 安装Git和CMake
-2. 克隆vcpkg: git clone https://github.com/Microsoft/vcpkg.git
-3. 运行: .\vcpkg\bootstrap-vcpkg.bat
+5. 将 C:\msys64\mingw64\bin 添加到系统PATH环境变量
 ```
 
 **Linux用户：**
@@ -170,34 +160,24 @@ make install-deps
 **MSYS2方式（推荐）：**
 ```bash
 # 在MSYS2 MINGW64终端中运行
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
-
-# 配置PATH环境变量
-setup_path.bat
-```
-
-**vcpkg方式：**
-```cmd
-# 安装SDL2相关库
-.\vcpkg\vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer
-
-# 如果使用x64版本
-.\vcpkg\vcpkg install sdl2:x64-windows sdl2-image:x64-windows sdl2-ttf:x64-windows sdl2-mixer:x64-windows
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+# 如果只缺make，也可以单独安装：
+pacman -S mingw-w64-x86_64-make
 ```
 
 **Linux：**
 ```bash
 # Ubuntu/Debian
-sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
+sudo apt-get install make pkg-config libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
 
 # Fedora/CentOS
-sudo dnf install SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
+sudo dnf install make pkgconf SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
 
 # Arch Linux
-sudo pacman -S sdl2 sdl2_image sdl2_ttf sdl2_mixer
+sudo pacman -S make sdl2 sdl2_image sdl2_ttf sdl2_mixer
 
-# 或使用Makefile查看指南
-make install-deps
+# 如果只缺make，也可以单独安装：
+sudo apt-get install make
 ```
 
 #### 步骤3：编译游戏
@@ -225,19 +205,12 @@ gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mi
 **Windows：**
 
 ```cmd
-REM 方式1：使用批处理脚本（推荐）
-build_simple.bat               REM 仅编译
-build_simple.bat run          REM 编译并运行
-
-REM 方式2：使用Makefile（在MSYS2中）
+# 推荐在MSYS2 MINGW64终端中使用make
 make                   REM 编译
 make run              REM 编译并运行
 
-REM 方式3：手动编译（MSYS2/MinGW）
+# 或者手动编译
 gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game.exe scripts/*.c
-
-REM 方式4：Visual Studio命令行（如果使用vcpkg）
-cl /I"vcpkg_path\include" scripts\*.c /link /LIBPATH:"vcpkg_path\lib" SDL2.lib SDL2_image.lib SDL2_ttf.lib SDL2_mixer.lib
 ```
 
 #### 步骤4：运行游戏
@@ -249,6 +222,10 @@ cl /I"vcpkg_path\include" scripts\*.c /link /LIBPATH:"vcpkg_path\lib" SDL2.lib S
 
 **Windows：**
 ```cmd
+# 在MSYS2 MINGW64终端中运行
+./knight_game.exe
+
+# 或者在普通命令提示符中运行（需已配置PATH）
 knight_game.exe
 ```
 
@@ -256,9 +233,6 @@ knight_game.exe
 ```bash
 # macOS/Linux
 ./build.sh run
-
-# Windows  
-build_simple.bat run
 
 # 任意平台（Makefile）
 make run
@@ -280,20 +254,6 @@ make run
 ./build.sh -h            # 显示帮助信息
 ```
 
-#### build_simple.bat (Windows)
-
-```cmd
-build_simple.bat                # 编译游戏并自动复制DLL
-build_simple.bat run           # 编译、复制DLL并运行游戏
-```
-
-#### 辅助工具脚本 (Windows)
-
-```cmd
-setup_path.bat             # 配置PATH环境变量
-diagnose.bat               # 检查环境和依赖问题
-```
-
 ### ⚠️ 常见问题解决
 
 #### 问题1：SDL2依赖库未找到
@@ -311,18 +271,14 @@ brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 make install-deps
 ```
 
-**Windows错误信息**：`GCC编译器未找到` 或 `SDL2.dll缺失`
+**Windows错误信息**：`GCC编译器未找到` 或 `SDL2.dll缺失` 或 `libwinpthread-1.dll缺失`
 **解决方案**：
 ```cmd
-REM 方法1：配置PATH环境变量
-setup_path.bat
-
-REM 方法2：查看安装指南
-diagnose.bat
-
-REM 方法3：MSYS2安装
-REM 在MSYS2 MINGW64终端运行：
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+# 1. 确保已安装MSYS2
+# 2. 确保已将 C:\msys64\mingw64\bin 添加到系统PATH
+# 3. 重新打开MSYS2 MINGW64终端
+# 4. 在MSYS2 MINGW64终端运行依赖安装命令
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 ```
 
 **Linux错误信息**：`pkg-config: command not found` 或依赖库未找到
@@ -333,13 +289,7 @@ sudo apt-get install pkg-config libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev li
 
 # Fedora
 sudo dnf install pkgconf SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
-```
 
-#### 问题2：编译权限问题
-**错误信息**：`Permission denied: ./build.sh`
-
-**解决方案（macOS/Linux）**：
-```bash
 # 给build.sh执行权限
 chmod +x build.sh
 ```
@@ -358,7 +308,7 @@ chmod +x build.sh
 ```
 1. 下载并安装MSYS2: https://www.msys2.org/
 2. 将MSYS2的mingw64/bin目录添加到系统PATH环境变量
-3. 重启命令提示符
+3. 重启命令提示符或MSYS2终端
 ```
 
 #### 问题4：音频文件缺失
@@ -525,8 +475,8 @@ gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -
 # macOS/Linux
 ./build.sh run
 
-# Windows  
-build_simple.bat run
+# Windows (在MSYS2 MINGW64终端中)
+make run
 
 # 跨平台
 make run
@@ -534,35 +484,9 @@ make run
 
 **完整Windows部署步骤：**
 1. 安装MSYS2: https://www.msys2.org/
-2. 在MSYS2终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
-3. 编译运行: `build_simple.bat run`
+2. 将 C:\msys64\mingw64\bin 添加到系统PATH环境变量
+3. 在MSYS2 MINGW64终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
+4. 编译运行: `make run`
 ## 素材引用
 贴图、音乐素材：https://brackeysgames.itch.io/brackeys-platformer-bundle
 字体素材：https://github.com/scott0107000/BoutiqueBitmap9x9
-
-### 📋 Windows适配说明
-
-#### PATH配置方式
-
-Windows适配采用**PATH环境变量配置**的方式：
-
-**优势：**
-- ✅ 节省磁盘空间，无需复制dll文件
-- ✅ 便于维护和更新
-- ✅ 多项目可共享同一套dll文件
-- ✅ 类似Linux系统的库管理方式
-- ✅ 一次配置，永久受益
-
-**使用方法：**
-```cmd
-# 一键配置PATH环境变量
-setup_path.bat
-
-# 编译并运行
-build_simple.bat run
-```
-
-**故障排除：**
-- 如果PATH配置后游戏无法运行，重新打开命令提示符
-- 运行 `where SDL2.dll` 验证库文件位置
-- 确保MSYS2正确安装在 `C:\msys64`

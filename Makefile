@@ -1,17 +1,17 @@
-# 超级骑士游戏 跨平台Makefile
+# Super Knight Game Cross-platform Makefile
 
-# 检测操作系统
+# Detect operating system
 ifeq ($(OS),Windows_NT)
-    # Windows系统
+    # Windows system
     PLATFORM = windows
     TARGET = knight_game.exe
-    RM = del /Q
+    RM = rm -f
     MKDIR = mkdir
     PATH_SEP = \\
     EXT = .exe
     CLEAN_EXTRA = *.o *.obj
 else
-    # Unix-like系统 (macOS, Linux)
+    # Unix-like systems (macOS, Linux)
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Darwin)
         # macOS
@@ -34,11 +34,11 @@ else
     endif
 endif
 
-# 编译器设置
+# Compiler settings
 CC = gcc
 CFLAGS = -std=c99 -Wall
 
-# 根据平台设置链接参数
+# Platform-specific linker flags
 ifeq ($(PLATFORM),windows)
     # Windows (MSYS2/MinGW)
     LDFLAGS = $(shell pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer)
@@ -50,44 +50,41 @@ else
     LDFLAGS = $(shell pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer)
 endif
 
-# 源文件（使用平台无关的路径分隔符）
+# Source files (using platform-independent path separators)
 SCRIPT_DIR = scripts
 SOURCES = $(SCRIPT_DIR)/main.c $(SCRIPT_DIR)/knight.c $(SCRIPT_DIR)/map.c $(SCRIPT_DIR)/render.c $(SCRIPT_DIR)/input.c $(SCRIPT_DIR)/camera.c $(SCRIPT_DIR)/blocks.c $(SCRIPT_DIR)/enemy.c $(SCRIPT_DIR)/ui.c $(SCRIPT_DIR)/sound.c
 HEADERS = $(SCRIPT_DIR)/knight.h $(SCRIPT_DIR)/map.h $(SCRIPT_DIR)/render.h $(SCRIPT_DIR)/input.h $(SCRIPT_DIR)/camera.h $(SCRIPT_DIR)/blocks.h $(SCRIPT_DIR)/enemy.h $(SCRIPT_DIR)/ui.h $(SCRIPT_DIR)/sound.h
 
-# 素材文件夹
+# Assets folder
 ASSETS_DIR = assets$(PATH_SEP)sprites
 
-# 默认目标
+# Default target
 all: $(TARGET)
 
-# 编译游戏
+# Compile game
 $(TARGET): $(SOURCES) $(HEADERS)
-	@echo "编译平台: $(PLATFORM)"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) $(SOURCES)
+	@echo "Building for platform: $(PLATFORM)"
+	$(CC) $(CFLAGS) -o $(TARGET) $(SOURCES) $(LDFLAGS)
 
-# 创建素材文件夹
+# Create assets folder
 assets:
 	$(MKDIR) $(ASSETS_DIR)
-	@echo "素材文件夹已创建：$(ASSETS_DIR)"
-	@echo "请将PNG素材文件放入此文件夹"
+	@echo "Assets folder created: $(ASSETS_DIR)"
+	@echo "Please place PNG sprite files in this folder"
 
-# 运行游戏
+# Run game
 run: $(TARGET)
 ifeq ($(PLATFORM),windows)
-	@echo "正在检查Windows PATH配置..."
-	@where SDL2.dll >nul 2>&1 || (echo "警告: SDL2.dll未在PATH中找到，可能需要运行setup_path.bat" && echo "提示: 如果游戏无法启动，请运行 setup_path.bat 配置环境")
-	$(TARGET)
+	./$(TARGET)
 else
 	./$(TARGET)
 endif
 
-# 清理编译文件
+# Clean build files
 clean:
 	$(RM) $(TARGET)
 ifeq ($(PLATFORM),windows)
-	if exist *.o $(RM) *.o
-	if exist *.obj $(RM) *.obj
+	$(RM) *.o *.obj
 else ifeq ($(PLATFORM),macos)
 	$(RM) *.dSYM
 	$(RM) -rf knight_game.dSYM
@@ -95,49 +92,44 @@ else
 	$(RM) *.o
 endif
 
-# 平台特定的依赖安装指令
+# Platform-specific dependency installation guide
 install-deps:
 ifeq ($(PLATFORM),windows)
-	@echo "Windows SDL2依赖安装指南："
+	@echo "Windows SDL2 dependency installation guide:"
 	@echo ""
-	@echo "方式1 - MSYS2 + PATH配置 (推荐):"
-	@echo "1. 安装MSYS2: https://www.msys2.org/"
-	@echo "2. 在MSYS2 MINGW64终端运行:"
-	@echo "   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
-	@echo "3. 配置PATH环境变量:"
-	@echo "   setup_path.bat"
-	@echo ""
-	@echo "方式2 - vcpkg (高级用户):"
-	@echo "   vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer"
+	@echo "1. Install MSYS2: https://www.msys2.org/"
+	@echo "2. Add C:\\msys64\\mingw64\\bin to system PATH environment variable"
+	@echo "3. Run in MSYS2 MINGW64 terminal:"
+	@echo "   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
 	@echo ""
 else ifeq ($(PLATFORM),macos)
-	@echo "安装SDL2依赖..."
+	@echo "Installing SDL2 dependencies..."
 	brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 else
-	@echo "Linux SDL2依赖安装："
+	@echo "Linux SDL2 dependency installation:"
 	@echo "Ubuntu/Debian: sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev"
 	@echo "Fedora: sudo dnf install SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel"
 	@echo "Arch: sudo pacman -S sdl2 sdl2_image sdl2_ttf sdl2_mixer"
 endif
 
-# 显示帮助
+# Show help
 help:
-	@echo "超级骑士游戏跨平台Makefile使用说明"
-	@echo "当前平台: $(PLATFORM)"
+	@echo "Super Knight Game Cross-platform Makefile Usage"
+	@echo "Current platform: $(PLATFORM)"
 	@echo ""
-	@echo "make           - 编译游戏"
-	@echo "make run       - 编译并运行游戏"
-	@echo "make assets    - 创建素材文件夹"
-	@echo "make clean     - 清理编译文件"
-	@echo "make install-deps - 显示依赖安装指南"
-	@echo "make help      - 显示此帮助信息"
+	@echo "make           - Compile game"
+	@echo "make run       - Compile and run game"
+	@echo "make assets    - Create assets folder"
+	@echo "make clean     - Clean build files"
+	@echo "make install-deps - Show dependency installation guide"
+	@echo "make help      - Show this help information"
 	@echo ""
-	@echo "素材使用："
-	@echo "1. make assets          # 创建素材文件夹"
-	@echo "2. 添加PNG文件到 assets/sprites/"
-	@echo "3. make run             # 运行游戏"
+	@echo "Asset usage:"
+	@echo "1. make assets          # Create assets folder"
+	@echo "2. Add PNG files to assets/sprites/"
+	@echo "3. make run             # Run game"
 	@echo ""
-	@echo "注意：首次编译前请先安装SDL2依赖库"
+	@echo "Note: Please install SDL2 dependencies before first compilation"
 
-# 声明伪目标
+# Declare phony targets
 .PHONY: all run clean assets install-deps help 
