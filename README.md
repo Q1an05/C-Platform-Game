@@ -58,14 +58,27 @@
 ## 📋 完整编译运行教程
 
 ### 🔧 系统要求
-- **操作系统**: macOS（项目专为macOS优化）
-- **编译器**: GCC（系统自带或Xcode Command Line Tools）
-- **包管理器**: Homebrew
+- **操作系统**: macOS / Windows / Linux（跨平台支持）
+- **编译器**: GCC (推荐) 或 Clang
 - **依赖库**: SDL2, SDL2_image, SDL2_ttf, SDL2_mixer
+
+#### 各平台要求详情
+**macOS**:
+- **包管理器**: Homebrew
+- **编译器**: GCC（系统自带或Xcode Command Line Tools）
+
+**Windows**:
+- **推荐环境**: MSYS2 + MinGW-w64
+- **替代方案**: vcpkg + Visual Studio, Dev-C++等
+- **编译器**: GCC (MinGW) 或 MSVC
+
+**Linux**:
+- **包管理器**: apt, dnf, pacman等
+- **编译器**: GCC（系统自带）
 
 ### 🚀 快速开始（推荐流程）
 
-**最简单的使用步骤：**
+#### macOS / Linux
 ```bash
 # 1. 进入项目目录
 cd 小学期作业
@@ -77,9 +90,30 @@ cd 小学期作业
 ./build.sh run
 ```
 
+#### Windows
+```cmd
+REM 1. 进入项目目录
+cd 小学期作业
+
+REM 2. 查看依赖安装指南（首次运行）
+build.bat deps
+
+REM 3. 编译并运行游戏
+build.bat run
+```
+
+#### 跨平台（使用Makefile）
+```bash
+# 任意平台
+make install-deps    # 查看依赖安装指南
+make run            # 编译并运行
+```
+
 ### 📥 详细安装步骤
 
-#### 步骤1：安装Homebrew（如果没有）
+#### 步骤1：环境准备
+
+**macOS用户：**
 ```bash
 # 检查是否已安装Homebrew
 brew --version
@@ -88,68 +122,152 @@ brew --version
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
+**Windows用户：**
+
+**方案1 - MSYS2（推荐）：**
+```
+1. 下载并安装MSYS2: https://www.msys2.org/
+2. 打开MSYS2 MINGW64终端
+3. 更新包数据库: pacman -Syu
+4. 重启终端，再次更新: pacman -Su
+```
+
+**方案2 - vcpkg：**
+```
+1. 安装Git和CMake
+2. 克隆vcpkg: git clone https://github.com/Microsoft/vcpkg.git
+3. 运行: .\vcpkg\bootstrap-vcpkg.bat
+```
+
+**Linux用户：**
+```bash
+# Ubuntu/Debian - 更新包管理器
+sudo apt update
+
+# CentOS/RHEL/Fedora - 更新包管理器  
+sudo dnf update  # 或 sudo yum update
+
+# Arch Linux - 更新包管理器
+sudo pacman -Syu
+```
+
 #### 步骤2：安装依赖库
 
-**方式一：使用项目脚本自动安装（推荐）**
+**macOS：**
 ```bash
-# 自动检查并安装所有依赖
+# 方式1：使用项目脚本（推荐）
 ./build.sh deps
-```
 
-**方式二：手动安装依赖**
-```bash
-# 安装SDL2相关库
+# 方式2：直接使用Homebrew
 brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
+
+# 方式3：使用Makefile
+make install-deps
 ```
 
-**方式三：使用Makefile安装**
+**Windows：**
+
+**MSYS2方式（推荐）：**
 ```bash
+# 在MSYS2 MINGW64终端中运行
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+
+# 或使用项目脚本查看指南
+build.bat deps
+```
+
+**vcpkg方式：**
+```cmd
+# 安装SDL2相关库
+.\vcpkg\vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer
+
+# 如果使用x64版本
+.\vcpkg\vcpkg install sdl2:x64-windows sdl2-image:x64-windows sdl2-ttf:x64-windows sdl2-mixer:x64-windows
+```
+
+**Linux：**
+```bash
+# Ubuntu/Debian
+sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
+
+# Fedora/CentOS
+sudo dnf install SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
+
+# Arch Linux
+sudo pacman -S sdl2 sdl2_image sdl2_ttf sdl2_mixer
+
+# 或使用Makefile查看指南
 make install-deps
 ```
 
 #### 步骤3：编译游戏
 
-有三种编译方式可选：
+**macOS / Linux：**
 
-**方式一：使用build.sh脚本（最推荐）**
 ```bash
-# 仅编译
-./build.sh
+# 方式1：使用shell脚本（推荐）
+./build.sh              # 仅编译
+./build.sh run          # 编译并运行
+./build.sh help         # 查看帮助
 
-# 编译并运行
-./build.sh run
+# 方式2：使用Makefile
+make                    # 编译
+make run               # 编译并运行
+make help              # 查看帮助
 
-# 查看所有选项
-./build.sh help
+# 方式3：手动编译（macOS）
+gcc -std=c99 -Wall $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o knight_game scripts/*.c
+
+# 方式3：手动编译（Linux）
+gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game scripts/*.c
 ```
 
-**方式二：使用Makefile**
-```bash
-# 编译
-make
+**Windows：**
 
-# 编译并运行
-make run
+```cmd
+REM 方式1：使用批处理脚本（推荐）
+build.bat               REM 仅编译
+build.bat run          REM 编译并运行
+build.bat help         REM 查看帮助
 
-# 查看帮助
-make help
-```
+REM 方式2：使用Makefile（在MSYS2中）
+make                   REM 编译
+make run              REM 编译并运行
 
-**方式三：手动编译**
-```bash
-gcc -std=c99 -Wall $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o knight_game scripts/main.c scripts/knight.c scripts/map.c scripts/render.c scripts/input.c scripts/camera.c scripts/blocks.c scripts/enemy.c scripts/ui.c scripts/sound.c
+REM 方式3：手动编译（MSYS2/MinGW）
+gcc -std=c99 -Wall $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game.exe scripts/*.c
+
+REM 方式4：Visual Studio命令行（如果使用vcpkg）
+cl /I"vcpkg_path\include" scripts\*.c /link /LIBPATH:"vcpkg_path\lib" SDL2.lib SDL2_image.lib SDL2_ttf.lib SDL2_mixer.lib
 ```
 
 #### 步骤4：运行游戏
 
-编译成功后运行：
+**macOS / Linux：**
 ```bash
 ./knight_game
 ```
 
-### 🛠️ build.sh脚本完整功能
+**Windows：**
+```cmd
+knight_game.exe
+```
 
-build.sh脚本提供了全面的构建管理功能：
+**跨平台（使用构建脚本）：**
+```bash
+# macOS/Linux
+./build.sh run
+
+# Windows  
+build.bat run
+
+# 任意平台（Makefile）
+make run
+```
+
+### 🛠️ 构建脚本完整功能
+
+#### build.sh (macOS/Linux)
 
 ```bash
 ./build.sh                # 默认编译游戏
@@ -163,11 +281,25 @@ build.sh脚本提供了全面的构建管理功能：
 ./build.sh -h            # 显示帮助信息
 ```
 
+#### build.bat (Windows)
+
+```cmd
+build.bat                # 默认编译游戏
+build.bat build         # 编译游戏
+build.bat compile       # 编译游戏（同build）
+build.bat run           # 编译并运行游戏
+build.bat clean         # 清理编译文件
+build.bat deps          # 显示依赖安装指南
+build.bat install       # 显示依赖安装指南（同deps）
+build.bat help          # 显示帮助信息
+build.bat -h            # 显示帮助信息
+```
+
 ### ⚠️ 常见问题解决
 
 #### 问题1：SDL2依赖库未找到
-**错误信息**：`SDL2未安装` 或 `command not found: sdl2-config`
 
+**macOS错误信息**：`SDL2未安装` 或 `command not found: sdl2-config`
 **解决方案**：
 ```bash
 # 方法1：使用脚本安装
@@ -180,22 +312,51 @@ brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
 make install-deps
 ```
 
+**Windows错误信息**：`GCC编译器未找到` 或 `SDL2未正确安装`
+**解决方案**：
+```cmd
+REM 方法1：查看安装指南
+build.bat deps
+
+REM 方法2：MSYS2安装
+REM 在MSYS2 MINGW64终端运行：
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+```
+
+**Linux错误信息**：`pkg-config: command not found` 或依赖库未找到
+**解决方案**：
+```bash
+# Ubuntu/Debian
+sudo apt-get install pkg-config libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
+
+# Fedora
+sudo dnf install pkgconf SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
+```
+
 #### 问题2：编译权限问题
 **错误信息**：`Permission denied: ./build.sh`
 
-**解决方案**：
+**解决方案（macOS/Linux）**：
 ```bash
 # 给build.sh执行权限
 chmod +x build.sh
 ```
 
-#### 问题3：Homebrew未安装
-**错误信息**：`command not found: brew`
+#### 问题3：包管理器未安装
 
+**macOS错误信息**：`command not found: brew`
 **解决方案**：
 ```bash
 # 安装Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+**Windows错误信息**：`MSYS2未安装` 或 `pacman: command not found`
+**解决方案**：
+```
+1. 下载并安装MSYS2: https://www.msys2.org/
+2. 将MSYS2的mingw64/bin目录添加到系统PATH环境变量
+3. 重启命令提示符
 ```
 
 #### 问题4：音频文件缺失
@@ -224,14 +385,54 @@ assets/sprites/
 └── world/           # 地形纹理
 ```
 
-#### 问题6：编译时出现警告
+#### 问题6：Windows路径问题
+**错误信息**：路径不存在或文件找不到
+
+**解决方案**：
+```cmd
+REM 确保在项目根目录下运行
+cd /d "项目路径"
+
+REM 使用反斜杠作为路径分隔符
+REM 避免路径中包含中文或特殊字符
+```
+
+#### 问题7：中文路径问题
+**现象**：路径包含中文字符导致编译失败
+
+**解决方案**：
+```
+1. 将项目移动到纯英文路径下（推荐）
+2. 或在MSYS2中使用UTF-8编码：
+   export LANG=zh_CN.UTF-8
+```
+
+#### 问题8：Visual Studio编译问题
+**错误信息**：找不到SDL2库文件
+
+**解决方案**：
+```cmd
+REM 确保vcpkg正确安装SDL2
+.\vcpkg\vcpkg list
+
+REM 设置vcpkg工具链
+cmake -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake
+
+REM 或使用预编译库并设置环境变量
+set SDL2_DIR=path\to\SDL2
+```
+
+#### 问题9：编译时出现警告
 **现象**：编译成功但有warning信息
 
 **解决方案**：
 警告信息通常不影响运行，如需消除可以：
 ```bash
-# 使用更宽松的编译选项
+# macOS/Linux：使用更宽松的编译选项
 gcc -std=c99 $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o knight_game scripts/*.c
+
+# Windows：使用更宽松的编译选项
+gcc -std=c99 $(pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer) -o knight_game.exe scripts/*.c
 ```
 
 ### 性能和特性
@@ -315,6 +516,21 @@ gcc -std=c99 $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 ---
 
- **现在就开始体验超级骑士的冒险之旅吧！** 
+**现在就开始体验超级骑士的冒险之旅吧！** 
 
-运行 `./build.sh run` 开始游戏！
+**快速开始命令：**
+```bash
+# macOS/Linux
+./build.sh run
+
+# Windows  
+build.bat run
+
+# 跨平台
+make run
+```
+
+**完整Windows部署步骤：**
+1. 安装MSYS2: https://www.msys2.org/
+2. 在MSYS2终端安装依赖: `pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer`
+3. 编译运行: `build.bat run`

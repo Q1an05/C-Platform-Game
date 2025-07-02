@@ -17,7 +17,7 @@ int enemy_count = 0;
 #define TILE_SIZE 16
 #define MAX_FALL_SPEED 10.0f
 
-// 栗子小子常量
+// 敌人常量
 #define GOOMBA_SPEED 1.0f
 #define GOOMBA_WIDTH 16
 #define GOOMBA_HEIGHT 16
