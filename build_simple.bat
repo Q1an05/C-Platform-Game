@@ -54,7 +54,11 @@ gcc -std=c99 -Wall -o knight_game.exe scripts\main.c scripts\knight.c scripts\ma
 
 if %errorlevel% equ 0 (
     echo [SUCCESS] Compilation successful!
-    echo [INFO] Run the game: knight_game.exe
+    
+    echo [INFO] Copying SDL2 runtime libraries...
+    call copy_dlls.bat
+    
+    echo [INFO] Game ready! You can run: knight_game.exe
     if "%1"=="run" (
         echo [INFO] Starting game...
         knight_game.exe

@@ -80,6 +80,9 @@ where make >nul 2>&1
 if %errorlevel% neq 0 (
     call :print_error "make tool not found"
     call :print_info "Solution: pacman -S mingw-w64-x86_64-make"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -158,13 +161,24 @@ REM Execute compilation
 REM Check compilation result
 if %errorlevel% equ 0 (
     call :print_success "Compilation successful!"
+    
+    call :print_info "Copying SDL2 runtime libraries..."
+    if exist "copy_dlls.bat" (
+        call copy_dlls.bat
+    ) else (
+        call :print_warning "copy_dlls.bat not found, you may need to copy DLL files manually"
+    )
+    
     if exist "%TARGET%" (
         dir "%TARGET%"
-        call :print_info "Run game: %TARGET%"
+        call :print_info "Game ready! You can run: %TARGET%"
     )
     exit /b 0
 ) else (
     call :print_error "Compilation failed!"
+    echo.
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -250,28 +264,62 @@ if "%ACTION%"=="--help" goto :action_help
 
 call :print_error "Unknown option: %ACTION%"
 call :show_help
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 1
 
 :action_build
 call :check_environment
-if %errorlevel% neq 0 exit /b 1
+if %errorlevel% neq 0 (
+    echo.
+    echo Press any key to exit...
+    pause >nul
+    exit /b 1
+)
 call :compile
-exit /b %errorlevel%
+if %errorlevel% neq 0 (
+    echo.
+    echo Press any key to exit...
+    pause >nul
+    exit /b 1
+)
+echo.
+echo Press any key to exit...
+pause >nul
+exit /b 0
 
 :action_run
 call :check_environment
-if %errorlevel% neq 0 exit /b 1
+if %errorlevel% neq 0 (
+    echo.
+    echo Press any key to exit...
+    pause >nul
+    exit /b 1
+)
 call :run
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 0
 
 :action_clean
 call :clean
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 0
 
 :action_deps
 call :install_deps
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 0
 
 :action_help
 call :show_help
+echo.
+echo Press any key to exit...
+pause >nul
 exit /b 0 
