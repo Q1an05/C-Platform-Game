@@ -37,19 +37,35 @@ where gcc >nul 2>&1
 if %errorlevel% neq 0 (
     call :print_error "GCC编译器未找到"
     call :print_info "请安装MinGW-w64或MSYS2"
-    call :print_info "推荐安装方式:"
-    call :print_info "1. 安装MSYS2: https://www.msys2.org/"
-    call :print_info "2. 运行: pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
+    call :print_info "推荐解决方案:"
+    call :print_info "在MSYS2 MINGW64终端运行: pacman -S mingw-w64-x86_64-gcc"
+    exit /b 1
+)
+
+REM 检查make工具
+where make >nul 2>&1
+if %errorlevel% neq 0 (
+    call :print_error "make工具未找到"
+    call :print_info "在MSYS2 MINGW64终端运行: pacman -S mingw-w64-x86_64-make"
+    exit /b 1
+)
+
+REM 检查pkg-config工具
+where pkg-config >nul 2>&1
+if %errorlevel% neq 0 (
+    call :print_error "pkg-config工具未找到"
+    call :print_info "在MSYS2 MINGW64终端运行: pacman -S mingw-w64-x86_64-pkg-config"
     exit /b 1
 )
 
 REM 检查pkg-config（通过SDL2库检查）
 pkg-config --exists sdl2 >nul 2>&1
 if %errorlevel% neq 0 (
-    call :print_error "SDL2未正确安装或pkg-config配置错误"
-    call :print_info "请确保SDL2相关库已正确安装"
-    call :print_info "MSYS2安装命令:"
-    call :print_info "pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
+    call :print_error "SDL2未正确安装或PKG_CONFIG_PATH配置错误"
+    call :print_info "请确保SDL2相关库已正确安装并设置环境变量"
+    call :print_info "MSYS2解决方案:"
+    call :print_info "1. pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer"
+    call :print_info "2. export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig""
     exit /b 1
 )
 
@@ -129,22 +145,32 @@ REM 安装依赖（指导用户）
 :install_deps
 call :print_info "Windows SDL2依赖安装指南..."
 echo.
-echo 推荐安装方式1 - MSYS2 (推荐):
-echo 1. 下载并安装MSYS2: https://www.msys2.org/
-echo 2. 打开MSYS2 MINGW64终端
-echo 3. 更新包数据库: pacman -Syu
-echo 4. 安装依赖: pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
-echo 5. 将MSYS2的mingw64/bin目录添加到系统PATH
+echo %YELLOW%========== 推荐解决方案 (MSYS2) ==========%NC%
+echo %GREEN%1. 安装MSYS2:%NC%
+echo    下载: https://www.msys2.org/
+echo    安装后打开 MSYS2 MINGW64 终端
 echo.
-echo 推荐安装方式2 - vcpkg:
-echo 1. 安装vcpkg: git clone https://github.com/Microsoft/vcpkg.git
-echo 2. 运行: .\vcpkg\bootstrap-vcpkg.bat
-echo 3. 安装SDL2: .\vcpkg\vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer
+echo %GREEN%2. 一次性安装所有依赖:%NC%
+echo    pacman -Syu
+echo    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
 echo.
-echo 推荐安装方式3 - 预编译库:
-echo 1. 从SDL官网下载开发库: https://www.libsdl.org/
-echo 2. 解压到项目目录并配置环境变量
+echo %GREEN%3. 设置环境变量:%NC%
+echo    export PATH="/mingw64/bin:/usr/bin:$PATH"
+echo    export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
 echo.
+echo %GREEN%4. 验证安装:%NC%
+echo    which gcc ^&^& which make ^&^& which pkg-config
+echo    pkg-config --cflags --libs sdl2
+echo.
+echo %YELLOW%========== 常见错误修复 ==========%NC%
+echo %RED%错误:%NC% 'make' 不是内部或外部命令
+echo %GREEN%解决:%NC% pacman -S mingw-w64-x86_64-make
+echo.
+echo %RED%错误:%NC% Package 'sdl2' was not found
+echo %GREEN%解决:%NC% pacman -S mingw-w64-x86_64-pkg-config
+echo        export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+echo.
+echo %YELLOW%详细文档: 查看 WINDOWS_SUPPORT.md%NC%
 goto :eof
 
 REM 显示帮助

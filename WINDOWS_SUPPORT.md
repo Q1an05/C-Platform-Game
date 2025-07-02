@@ -1,5 +1,46 @@
 # Windows 系统支持说明
 
+## 🚨 快速修复常见错误
+
+如果你遇到以下错误，请立即执行对应的修复命令：
+
+### ❌ `'make' 不是内部或外部命令`
+```bash
+# 在MSYS2 MINGW64终端运行
+pacman -S mingw-w64-x86_64-make
+```
+
+### ❌ `Package 'sdl2' was not found`
+```bash
+# 在MSYS2 MINGW64终端运行
+pacman -S mingw-w64-x86_64-pkg-config
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+```
+
+### ❌ `GCC编译器未找到`
+```bash
+# 在MSYS2 MINGW64终端运行
+pacman -S mingw-w64-x86_64-gcc
+export PATH="/mingw64/bin:$PATH"
+```
+
+### 🔧 完整安装命令（一次性解决所有问题）
+```bash
+# 在MSYS2 MINGW64终端运行以下完整命令
+pacman -Syu
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+
+# 设置环境变量
+export PATH="/mingw64/bin:/usr/bin:$PATH"
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+
+# 验证安装
+which gcc && which make && which pkg-config
+pkg-config --cflags --libs sdl2
+```
+
+---
+
 ## 🎯 Windows 适配完成情况
 
 ### ✅ 已完成的适配工作
@@ -38,13 +79,28 @@
    ```bash
    # 在MSYS2 MINGW64终端运行
    pacman -Syu
-   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
    ```
 
-3. **编译运行**
+3. **配置环境变量**
+   ```bash
+   # 将以下路径添加到系统PATH环境变量（重要！）
+   C:\msys64\mingw64\bin
+   C:\msys64\usr\bin
+   
+   # 或者在MSYS2终端中设置（临时）
+   export PATH="/mingw64/bin:/usr/bin:$PATH"
+   export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+   ```
+
+4. **编译运行**
    ```cmd
+   # 在MSYS2 MINGW64终端或配置好环境变量的CMD中运行
    cd 小学期作业
    build.bat run
+   
+   # 或者使用make命令
+   make run
    ```
 
 ### 方案二：vcpkg
@@ -87,22 +143,49 @@ build.bat help          # 显示帮助信息
 
 ## ⚠️ Windows常见问题
 
-### 问题1：GCC编译器未找到
+### 问题1：'make' 不是内部或外部命令
+**解决方案**：
+```bash
+# 在MSYS2终端安装make工具
+pacman -S mingw-w64-x86_64-make
+
+# 将C:\msys64\mingw64\bin添加到系统PATH环境变量
+# 或在当前会话中设置
+export PATH="/mingw64/bin:$PATH"
+```
+
+### 问题2：GCC编译器未找到
 **解决方案**：
 - 安装MSYS2并将`C:\msys64\mingw64\bin`添加到PATH
 - 或安装MinGW-w64独立版本
 
-### 问题2：SDL2库未找到
+### 问题3：Package 'sdl2' was not found
+**解决方案**：
+```bash
+# 1. 安装pkg-config工具
+pacman -S mingw-w64-x86_64-pkg-config
+
+# 2. 设置PKG_CONFIG_PATH环境变量
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig"
+
+# 3. 永久设置（添加到系统环境变量）
+# PKG_CONFIG_PATH = C:\msys64\mingw64\lib\pkgconfig;C:\msys64\mingw64\share\pkgconfig
+
+# 4. 验证SDL2是否能被找到
+pkg-config --cflags --libs sdl2
+```
+
+### 问题4：SDL2库未找到
 **解决方案**：
 - 确保在MSYS2环境中正确安装了SDL2包
 - 检查pkg-config配置是否正确
 
-### 问题3：中文路径问题
+### 问题5：中文路径问题
 **解决方案**：
 - 将项目移动到纯英文路径
 - 或设置UTF-8编码：`chcp 65001`
 
-### 问题4：权限问题
+### 问题6：权限问题
 **解决方案**：
 - 以管理员身份运行命令提示符
 - 检查防病毒软件是否阻止编译
@@ -142,10 +225,13 @@ build.bat help          # 显示帮助信息
 在Windows上部署游戏前，请确认：
 
 - [ ] 已安装GCC编译器（MSYS2/MinGW）
+- [ ] 已安装make工具（mingw-w64-x86_64-make）
+- [ ] 已安装pkg-config工具（mingw-w64-x86_64-pkg-config）
 - [ ] 已安装SDL2相关库
+- [ ] PATH环境变量包含：C:\msys64\mingw64\bin
+- [ ] PKG_CONFIG_PATH环境变量已设置
 - [ ] 项目路径不包含中文字符
 - [ ] 所有资源文件存在（assets目录）
-- [ ] 环境变量配置正确
 - [ ] 防火墙允许程序运行
 
 ## 📞 技术支持
